@@ -79,4 +79,4 @@ The local browser checks do not replace testing the final deployed URL and real 
 
 ## Mini cards
 
-Provide a page-wide Standard cards / Mini cards selector above the clocks. Mini view uses smaller cards in a denser responsive grid, with two columns on phones. Retain all clock controls, readable digital displays, scrollable settings backs, and Time Travel indicators. Recompute virtualized row geometry and drag targets for the selected layout. Persist mini view as `view=mini`, including reload, shared links, and Back/Forward.
+Provide a page-wide Standard cards / Mini cards selector above the clocks. Mini view uses smaller cards in a denser responsive grid, with two columns on phones. Retain all clock controls, readable digital displays, scrollable settings backs, and Time Travel indicators. Recompute virtualized row geometry and drag targets for the selected layout. Default to mini cards. Persist standard view as `view=standard`, including reload, shared links, and Back/Forward; missing values and existing `view=mini` links use mini cards.

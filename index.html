@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="./styles.css">
   <script type="module" src="./src/app.js"></script>
 </head>
-<body>
+<body data-card-view="mini">
   <button class="skip-link" type="button">Skip to clocks</button>
   <div class="page">
     <header class="site-header">
@@ -27,7 +27,7 @@
       <div id="scale-warning" class="notice" role="status" hidden>You have 1,000 or more clocks. Large dashboards may be slower to sort, copy, or share on some devices. You can continue adding clocks.</div>
       <section aria-labelledby="clocks-title">
         <h2 id="clocks-title" class="sr-only">Your clocks</h2>
-        <div class="view-controls segments" role="group" aria-label="Card size"><button type="button" data-card-view="standard" aria-pressed="true">Standard cards</button><button type="button" data-card-view="mini" aria-pressed="false">Mini cards</button></div>
+        <div class="view-controls segments" role="group" aria-label="Card size"><button type="button" data-card-view="standard" aria-pressed="false">Standard cards</button><button type="button" data-card-view="mini" aria-pressed="true">Mini cards</button></div>
         <div class="sort-controls" role="group" aria-label="Sort clocks"><button id="sort-ascending">Earliest to latest ↑</button><button id="sort-descending">Latest to earliest ↓</button></div>
         <div id="clocks" class="clock-grid" role="list" aria-label="Clocks" tabindex="-1"></div>
         <div id="empty" class="empty" hidden><div class="empty-icon" aria-hidden="true">◷</div><h3>No clocks yet.</h3><p>Add a city to get started.</p><button id="empty-add" class="button primary">＋ Add clock</button></div>

@@ -187,7 +187,7 @@ async function loadLocation() {
   const url = location.href;
   if (url === activeLocation) return;
   activeLocation = url;
-  applyCardView(new URL(url).searchParams.get('view') === 'mini' ? 'mini' : 'standard');
+  applyCardView(new URL(url).searchParams.get('view') === 'standard' ? 'standard' : 'mini');
   const request = ++locationRequest;
   if (drag) clearDrag();
   if (dialog.open) closeDialog();
@@ -227,7 +227,7 @@ for (const button of document.querySelectorAll('button[data-card-view]')) button
   if (drag) clearDrag();
   try {
     const url = new URL(travelURL(stateURL(location.href, clocks), frozenAt));
-    if (view === 'mini') url.searchParams.set('view', 'mini'); else url.searchParams.delete('view');
+    if (view === 'standard') url.searchParams.set('view', 'standard'); else url.searchParams.delete('view');
     history.pushState(null, '', url);
     locationRequest++;
     activeLocation = url.href;

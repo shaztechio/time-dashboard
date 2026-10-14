@@ -7,7 +7,9 @@ import { clockCatalog } from '../src/catalog.js';
 const lookup = clockCatalog(JSON.parse(await readFile(new URL('../data/clock-catalog-2026-10-14.json', import.meta.url))));
 const savedClocks = url => readState(url, lookup).clocks;
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
-const base = process.env.TEST_URL || 'http://127.0.0.1:4173/';
+const testBase = new URL(process.env.TEST_URL || 'http://127.0.0.1:4173/');
+testBase.searchParams.set('view', 'standard');
+const base = testBase.href;
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, colorScheme: 'dark' });
 const page = await context.newPage();
@@ -75,7 +77,7 @@ try {
     await page.waitForFunction(left => Math.abs(document.querySelector('.card-placeholder').getBoundingClientRect().left - left) < 1, to.x);
     assert.ok((await neighbor.boundingBox()).x < neighborBefore.x - 100, 'neighbor slides into the vacated slot before release');
     assert.equal(await page.evaluate(() => window.history.length), history);
-    await page.screenshot({ path: 'test-results/dragging.png', fullPage: true });
+    await page.screenshot({ path: 'test-results/dragging.png' });
     await page.mouse.up();
     assert.equal(await page.locator('.settling').count(), 1);
     await page.waitForSelector('.dragging', { state: 'detached' });
@@ -237,7 +239,7 @@ try {
     await page.locator('#close-share').click();
   });
   await test('invalid links, safe text rendering, and clipboard fallback', async () => {
-    await page.goto(`${base}?v=99&clocks=[]`);
+    await page.goto(`${base}&v=99&clocks=[]`);
     await count(4);
     assert.equal(await page.locator('#notice').isVisible(), true);
     assert.ok(page.url().includes('v=99'));

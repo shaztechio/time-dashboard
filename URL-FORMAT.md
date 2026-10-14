@@ -83,4 +83,4 @@ Freezing, setting a time, and returning to now each create a history entry; retu
 
 ## Card size extension
 
-The optional `view=mini` query parameter selects the compact card layout for the entire dashboard. Missing or unrecognized values use standard cards. Switching back to standard removes the parameter. Changing size creates one history entry and preserves the clock fragment and optional frozen `at` instant. Clock edits and Copy link retain the selected view.
+Mini cards are the default. The optional `view=standard` query parameter selects the larger card layout for the entire dashboard. Missing or unrecognized values use mini cards; existing `view=mini` links still work. Switching back to mini removes the parameter. Changing size creates one history entry and preserves the clock fragment and optional frozen `at` instant. Clock edits and Copy link retain the selected view.

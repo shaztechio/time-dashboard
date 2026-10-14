@@ -30,7 +30,7 @@ Open [the local dashboard](http://127.0.0.1:4173). Use `PORT=8080 npm run dev` t
 
 ## Card size
 
-Choose **Standard cards** or **Mini cards** above the clocks. Mini cards show a denser grid, including two columns on phones, while retaining analog/digital displays, flip settings, dragging, and Time Travel. Settings on mini-card backs scroll when needed. The `view=mini` query parameter saves the page-wide choice in copied links and browser history; omitting it uses standard cards. Run `npm run test:mini` for browser checks.
+Choose **Standard cards** or **Mini cards** above the clocks. Mini cards show a denser grid, including two columns on phones, while retaining analog/digital displays, flip settings, dragging, and Time Travel. Settings on mini-card backs scroll when needed. Mini cards are the default. The `view=standard` query parameter saves the larger layout in copied links and browser history; omitting it uses mini cards. Existing `view=mini` links still work. Run `npm run test:mini` for browser checks.
 
 ## Time Travel
 

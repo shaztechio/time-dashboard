@@ -13,9 +13,11 @@ await mkdir('test-results',{recursive:true});
 try {
  await page.goto(stateURL(base,many.slice(0,12)));
  await page.waitForSelector('.clock-card');
+ assert.equal(await page.locator('body').getAttribute('data-card-view'),'mini');
+ await page.locator('[data-card-view="standard"]').click();
  const standard=(await page.locator('.clock-slot').first().boundingBox()).height;
  await page.locator('[data-card-view="mini"]').click();
- assert.equal(new URL(page.url()).searchParams.get('view'),'mini');
+ assert.equal(new URL(page.url()).searchParams.has('view'),false);
  assert.ok((await page.locator('.clock-slot').first().boundingBox()).height < standard*.8);
  await page.screenshot({path:'test-results/mini-cards-desktop.png'});
  const from=await page.locator('.reorder-handle').first().boundingBox();
@@ -26,7 +28,8 @@ try {
  assert.equal(readState(page.url(),catalog).clocks[2].id,first);
  await page.reload(); await page.waitForSelector('body[data-card-view="mini"] .clock-card');
  await page.locator('[data-card-view="standard"]').click();
- assert.equal(new URL(page.url()).searchParams.has('view'),false);
+ assert.equal(new URL(page.url()).searchParams.get('view'),'standard');
+ await page.reload(); await page.waitForSelector('body[data-card-view="standard"] .clock-card');
  await page.goBack();await page.waitForSelector('body[data-card-view="mini"]');
  await page.setViewportSize({width:320,height:800});
  await page.locator('.clock-slot').first().scrollIntoViewIfNeeded();
