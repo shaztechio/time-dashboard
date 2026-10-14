@@ -348,7 +348,7 @@ body[data-card-view="mini"] .card-bottom { margin-bottom: -8px; padding: 0 28px;
 body[data-card-view="mini"] .design-open { left: -10px; }
 body[data-card-view="mini"] .design-settings .segments { flex-wrap: wrap; }
 
-.design-open span { font-size: 19px; line-height: 1; filter: grayscale(1); opacity: .72; }
+.design-open span { font-size: 19px; line-height: 1; filter: grayscale(1); opacity: .4; }
 
 @container (max-width: 160px) {
   .palette-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
