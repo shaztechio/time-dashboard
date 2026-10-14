@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { prepareCities, searchCities, citiesInZone, utc, alreadyAdded, cityClock } from '../src/search.js';
 import { defaults, validateClocks } from '../src/state.js';
-const data = JSON.parse(await readFile(new URL('../data/cities.json', import.meta.url)));
+import { CATALOG_VERSION } from '../src/catalog.js';
+const data = JSON.parse(await readFile(new URL(`../data/cities-${CATALOG_VERSION}.json`, import.meta.url)));
 const cities = prepareCities([utc, ...data.cities.map(([id, name, region, country, zone, population, aliases]) => ({ id: `geonames:${id}`, name, region, country, zone, population, aliases }))]);
 
 test('packaged catalog covers the world and has unique, valid clock records', () => {

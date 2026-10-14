@@ -39,7 +39,7 @@ try {
     assert.deepEqual(await cards.evaluateAll(els => els.map(el => el.dataset.display)), ['analog', 'analog', 'analog', 'analog']);
     assert.equal(await cards.first().locator('.time-display').evaluate(el => el.getBoundingClientRect().width <= 1), true);
     assert.equal(await cards.first().locator('h3').evaluate(el => getComputedStyle(el).textAlign), 'center');
-    assert.equal(requests.some((url) => url.includes('cities.json')), false);
+    assert.equal(requests.some((url) => /\/cities-[0-9-]+\.json/.test(url)), false);
     const before = await cards.first().locator('.time-seconds').textContent();
     const history = await page.evaluate(() => window.history.length);
     await page.waitForFunction((value) => document.querySelector('.time-seconds').textContent !== value, before);
@@ -257,13 +257,13 @@ try {
     await page.locator('#close-share').click();
   });
   await test('search failure leaves clocks live and can retry', async () => {
-    await page.route('**/data/cities.json', (route) => route.abort());
+    await page.route('**/data/cities-*.json', (route) => route.abort());
     await page.goto(base);
     await count(4);
     await page.locator('#add-clock').click();
     await page.waitForSelector('#search-error', { state: 'visible' });
     assert.equal(await cards.count(), 4);
-    await page.unroute('**/data/cities.json');
+    await page.unroute('**/data/cities-*.json');
     await page.locator('#retry-search').click();
     await page.waitForFunction(() => document.querySelector('#search-status').textContent.includes('places'));
     await page.locator('#city-search').fill('London');

@@ -25,5 +25,5 @@ for (const line of (await readFile(citiesFile, 'utf8')).trim().split('\n')) {
 }
 cities.sort((a, b) => b[5] - a[5]);
 const payload = { version: 1, snapshot, source: 'https://download.geonames.org/export/dump/', license: 'CC BY 4.0', fields: ['id', 'name', 'region', 'country', 'zone', 'population', 'aliases'], cities };
-await writeFile('data/cities.json', JSON.stringify(payload));
+await writeFile(`data/cities-${snapshot}.json`, JSON.stringify(payload), { flag: 'wx' });
 console.log(`Generated ${cities.length} searchable cities (${(Buffer.byteLength(JSON.stringify(payload)) / 1024 / 1024).toFixed(2)} MiB).`);

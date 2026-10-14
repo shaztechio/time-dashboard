@@ -73,6 +73,7 @@ npx playwright install chromium
 npm run build
 npm run test:browser
 npm run test:scale
+npm run test:offline
 ```
 
 Alternatively, set `PLAYWRIGHT_MODULE` to an absolute path to an existing Playwright ESM entry point. `TEST_URL` overrides the default local URL. Screenshots are saved under ignored `test-results/`.
@@ -89,7 +90,7 @@ npm run build
 
 Upload the contents of `dist/` to any HTTP(S) static host. The build just copies the application and bundled data; it does not deploy or require a bundler. No route rewrites, secrets, server functions, or runtime API calls are needed. Root URLs and subdirectory URLs such as `/time-dashboard/` both work; preserve the trailing slash for directory URLs and serve standard JavaScript/JSON MIME types.
 
-Enable the host’s gzip/Brotli compression for JSON. The search catalog is approximately 5.1 MiB uncompressed or 2.1 MiB with gzip; it is loaded only for search. Saved links fetch the smaller versioned clock lookup at startup. Deploy all assets together so the catalog and application stay consistent. A service worker and guaranteed offline reloading are not included.
+The build includes Brotli/gzip variants, cache-header rules, and an offline service worker. The versioned search catalog is loaded only when Add Clock opens and is cached after first use (1.40 MiB Brotli / 2.05 MiB gzip). Production dashboards also save their smaller lookup catalog for offline links. App files are installed for offline reload, with safe updates and scoped cache cleanup. Run `PORT=4174 npm run preview` to verify the built site locally. Configure the production host to negotiate compression and apply cache headers; uploading sidecars alone is insufficient. See [OFFLINE.md](OFFLINE.md) for deployment, offline limits, update behavior, and tests.
 
 ## Refresh city data
 
@@ -97,7 +98,7 @@ Download and extract `cities15000.zip` and download `admin1CodesASCII.txt` from 
 
 ```sh
 npm run catalog -- /path/to/cities15000.txt /path/to/admin1CodesASCII.txt YYYY-MM-DD
-node scripts/build-clock-catalog.mjs
+node scripts/build-clock-catalog.mjs YYYY-MM-DD
 # Update the supported/current versions in src/catalog.js; retain older lookup files.
 npm test
 npm run build

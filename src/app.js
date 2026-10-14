@@ -1,5 +1,7 @@
 import { defaults, readState, stateURL, clockTitle, decodeTokens, SOFT_CLOCK_LIMIT } from './state.js';
-import { loadClockCatalog } from './catalog.js';
+import { loadClockCatalog, CATALOG_VERSION } from './catalog.js';
+import { catalogJSON } from './catalog-cache.js';
+import './offline.js';
 import { orderedClocks, timeAt } from './time.js';
 import { createCard, updateCard } from './card.js';
 import { utc, prepareCities, searchCities, citiesInZone, alreadyAdded, cityClock } from './search.js';
@@ -195,7 +197,9 @@ async function loadLocation() {
   try {
     frozenAt = readTravelTime(url);
     const tokens = decodeTokens(url);
-    loadingLocation = tokens !== null && tokens.length > 0;
+    // The production default dashboard also needs its lookup saved before a
+    // later edit turns the bare URL into a compact link that is opened offline.
+    loadingLocation = tokens !== null ? tokens.length > 0 : !!document.querySelector('meta[name="offline-enabled"]');
     if (loadingLocation) {
       $('#notice').textContent = 'Loading your clocks…';
       $('#notice').hidden = false;
@@ -441,15 +445,20 @@ async function loadCatalog() {
   $('#search-error').hidden = true;
   catalogPromise = (async () => {
     try {
-      const response = await fetch(new URL('../data/cities.json', import.meta.url));
-      if (!response.ok) throw new Error('Catalog unavailable');
-      const data = await response.json();
+      if (document.querySelector('meta[name="offline-enabled"]')) await loadClockCatalog();
+      const data = await catalogJSON(new URL(`../data/cities-${CATALOG_VERSION}.json`, import.meta.url), data => {
+        if (data.snapshot !== CATALOG_VERSION || !Array.isArray(data.cities) || data.version !== 1) throw new Error('Invalid search catalog');
+      });
       catalog = prepareCities([utc, ...data.cities.map(([id, name, region, country, zone, population, aliases]) => ({ id: `geonames:${id}`, name, region, country, zone, population, aliases }))]);
       if (dialog.open) showResults();
       return catalog;
     } catch {
       catalogFailed = true;
-      if (dialog.open) { $('#search-status').textContent = 'Could not load cities'; $('#search-error').hidden = false; }
+      if (dialog.open) {
+        $('#search-status').textContent = 'Could not load cities';
+        $('#search-error p').textContent = 'We couldn’t load the city list. Connect once and retry to save search for offline use. Your existing clocks are still available.';
+        $('#search-error').hidden = false;
+      }
       return null;
     } finally { catalogPromise = null; }
   })();

@@ -41,7 +41,7 @@ Names, countries, and IANA zones are resolved from `data/clock-catalog-2026-10-1
 
 Use `stateURL(baseURL, clocks)` from `src/state.js` rather than concatenating fragment text. It validates records, maps internal preset aliases to GeoNames IDs, packs the integers, and produces a deterministic gzip stream (`level: 6`, `mtime: 0`). Compression is provided by the bundled, MIT-licensed fflate 0.8.3 browser module; there are no runtime CDN requests or native compression API requirements.
 
-`decodeTokens(url)` validates and unpacks a fragment. `loadClockCatalog(version)` asynchronously loads and caches the corresponding static lookup file. `readState(url, catalog)` resolves records and validates IANA zones using the browser. Nonempty saved links require the lookup catalog; bare defaults and empty dashboards do not. Catalog failures show an explanatory notice and defaults while preserving the original link so reloading can retry it.
+`decodeTokens(url)` validates and unpacks a fragment. `loadClockCatalog(version)` asynchronously loads and caches the corresponding static lookup file. `readState(url, catalog)` resolves records and validates IANA zones using the browser. Nonempty saved links require the lookup catalog; empty dashboards do not. The production build also saves the current lookup for bare default dashboards so later edited links can reload offline. Catalog failures show an explanatory notice and defaults while preserving the original link so reloading can retry it.
 
 The decoder checks syntax, known versions, gzip headers, CRC32, integer types, duplicate IDs, missing cities, and supported time zones. It accepts the gzip header variant emitted by this encoder (DEFLATE with no optional header fields); arbitrary gzip options and concatenated members are outside the format. There is a 512 KiB fragment-text limit and a 1 MiB decoded-buffer limit to bound resource use. These are defensive byte limits, not the 1,000-clock warning threshold.
 
@@ -55,7 +55,7 @@ The theme remains a per-device preference in local storage and is not shared in 
 
 ## Catalog lifecycle
 
-Lookup files are immutable. `node scripts/build-clock-catalog.mjs` derives the current snapshot from `data/cities.json` and refuses to overwrite an existing file with different content. The build verifies that the current search catalog and lookup records match and that every supported lookup version is present.
+Lookup files are immutable. `node scripts/build-clock-catalog.mjs` derives the current snapshot from `data/cities-YYYY-MM-DD.json` and refuses to overwrite an existing file with different content. The build verifies that the current search catalog and lookup records match and that every supported lookup version is present.
 
 When updating city data, generate a new dated lookup file, set `CATALOG_VERSION` in `src/catalog.js` to that version, and keep previous versions explicitly listed in `CATALOG_VERSIONS` along with their lookup files. This preserves existing v2 links. Unknown catalog versions fail clearly rather than interpreting IDs through a different snapshot.
 
@@ -84,3 +84,5 @@ Freezing, setting a time, and returning to now each create a history entry; retu
 ## Card size extension
 
 Mini cards are the default. The optional `view=standard` query parameter selects the larger card layout for the entire dashboard. Missing or unrecognized values use mini cards; existing `view=mini` links still work. Switching back to mini removes the parameter. Changing size creates one history entry and preserves the clock fragment and optional frozen `at` instant. Clock edits and Copy link retain the selected view.
+
+Catalogs use immutable versioned URLs, HTTP caching, and deployment-scoped offline Cache Storage. See [OFFLINE.md](OFFLINE.md) for compression, service-worker installation, update policies, and hosting requirements.

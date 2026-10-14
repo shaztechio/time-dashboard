@@ -80,3 +80,7 @@ The local browser checks do not replace testing the final deployed URL and real 
 ## Mini cards
 
 Provide a page-wide Standard cards / Mini cards selector above the clocks. Mini view uses smaller cards in a denser responsive grid, with two columns on phones. Retain all clock controls, readable digital displays, scrollable settings backs, and Time Travel indicators. Recompute virtualized row geometry and drag targets for the selected layout. Default to mini cards. Persist standard view as `view=standard`, including reload, shared links, and Back/Forward; missing values and existing `view=mini` links use mini cards.
+
+## Offline and catalog caching
+
+Production builds emit versioned immutable search/lookup catalogs, Brotli/gzip variants, host header rules, and a revisioned app-shell service worker. Save catalogs on successful first use, never preload the full search catalog during installation. Keep default and saved dashboards reloadable offline after their lookup is saved; search requires one successful online load. Validate app-shell hashes before installing and preserve active tabs until they close; clean up only obsolete caches belonging to this deployment. Storage/worker failures preserve online behavior. Development mode disables persistent offline behavior. See OFFLINE.md for the deployment contract and validation suite.

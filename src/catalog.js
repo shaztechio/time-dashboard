@@ -1,3 +1,4 @@
+import { catalogJSON } from './catalog-cache.js';
 export const CATALOG_VERSION = '2026-10-14';
 export const CATALOG_VERSIONS = [CATALOG_VERSION];
 export function clockCatalog(data, version = CATALOG_VERSION) {
@@ -9,8 +10,7 @@ export function clockCatalog(data, version = CATALOG_VERSION) {
 const pending = new Map();
 export function loadClockCatalog(version = CATALOG_VERSION) {
   if (!CATALOG_VERSIONS.includes(version)) return Promise.reject(new Error('Unsupported city catalog'));
-  if (!pending.has(version)) pending.set(version, fetch(new URL(`../data/clock-catalog-${version}.json`, import.meta.url))
-    .then(response => { if (!response.ok) throw new Error('Could not load the city catalog'); return response.json(); })
+  if (!pending.has(version)) pending.set(version, catalogJSON(new URL(`../data/clock-catalog-${version}.json`, import.meta.url), data => clockCatalog(data, version))
     .then(data => clockCatalog(data, version)).catch(error => { pending.delete(version); throw error; }));
   return pending.get(version);
 }
