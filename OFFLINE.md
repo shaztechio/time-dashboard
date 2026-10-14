@@ -17,6 +17,8 @@ The current search data is 5,335,953 bytes raw, 2,145,547 bytes gzip, or 1,470,6
 
 The included production preview server negotiates Brotli/gzip from `Accept-Encoding`, uses `Vary: Accept-Encoding`, serves correct `Content-Type` and `Content-Encoding`, and supplies representation-specific ETags with conditional 304 responses. Uncompressed responses remain available. The development server also supplies ETags but always revalidates resources.
 
+The following policies are emitted for the local production preview and hosts that honor `_headers`; they are not configurable through this file on GitHub Pages.
+
 | Resource | Cache-Control |
 | --- | --- |
 | Versioned catalog JSON and `.json.gz` files | `public, max-age=31536000, immutable` |
@@ -42,9 +44,9 @@ Cached raw data still needs parsing and search preparation after a reload; cachi
 
 ## Offline behavior
 
-Once the footer says **Ready offline**, the app files are installed. Clocks, formats, reordering, theme choices, Time Travel, and existing saved links work offline when their lookup snapshot has been downloaded. Search and adding cities work offline after Add Clock has successfully loaded once. An uncached catalog still needs connectivity; the app provides a retry message instead of claiming it is available offline.
+Once the footer says **Ready offline**, the app files are installed. Clocks, formats, reordering, per-card designs, mini/standard layout, page appearance choices, Time Travel, and existing saved links work offline when their lookup snapshot has been downloaded. Search and adding cities work offline after Add Clock has successfully loaded once. An uncached catalog still needs connectivity; the app provides a retry message instead of claiming it is available offline.
 
-The worker serves only this deployment's known files and root/index navigations. Query parameters and fragments stay in the browser URL, so layout, frozen time, and clock order survive offline reload. Root and subdirectory deployments are supported. External requests and unrelated navigations are not cached.
+The worker serves only this deployment's known files and root/index navigations. Query parameters and fragments stay in the browser URL, so layout, frozen time, card designs, and clock order survive offline reload. Root and subdirectory deployments are supported. External requests and unrelated navigations are not cached.
 
 Browsers may evict site data, private browsing may restrict storage, and users can clear caches. Offline use is therefore conditional on retained data, not a permanent storage guarantee. The app remains usable online when service workers or Cache Storage are unavailable.
 
@@ -58,6 +60,6 @@ To inspect or reset offline storage, use browser developer tools → Application
 
 ## Verification
 
-After building, run `npm run test:offline` with Playwright available (or set `PLAYWRIGHT_MODULE`). It starts an isolated production fixture and checks explicit gzip downloads without Content-Encoding, no duplicate raw catalog downloads, canonical decoded caching, Brotli/gzip negotiation, ETags/304, cache policy, lazy downloads, first-visit lookup caching, offline links/search/add/Time Travel, subdirectory scope, corrupt-cache recovery, failed installation, waiting upgrades, activation cleanup, and unavailable-storage fallback.
+Run `npm test` for gzip loader cases including unsupported decompression, corrupt/missing downloads, server-decoded responses, and JSON fallback. After building, run `npm run test:offline` with Playwright available (or set `PLAYWRIGHT_MODULE`). It starts an isolated production fixture and checks explicit gzip downloads without Content-Encoding, no duplicate raw catalog downloads, canonical decoded caching, Brotli/gzip negotiation, ETags/304, cache policy, lazy downloads, first-visit lookup caching, offline links/search/add/Time Travel, subdirectory scope, corrupt-cache recovery, failed installation, waiting upgrades, activation cleanup, and unavailable-storage fallback.
 
 Background: [MDN HTTP caching](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching), [MDN service-worker lifecycle](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers), and [Content-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Encoding).

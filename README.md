@@ -2,6 +2,8 @@
 
 A static world-clock dashboard with a 1,000-clock soft cap, independent analog/digital and 12/24-hour settings, daylight saving support, and shareable URL configuration. Built with HTML, CSS, and JavaScript modules; a vendored compression module and no application server.
 
+Documentation reviewed against the implementation on 2026-10-15.
+
 ## Run locally
 
 Requires Node.js 22 or newer. No package installation is needed for the app or unit tests.
@@ -15,7 +17,7 @@ Open [the local dashboard](http://127.0.0.1:4173). Use `PORT=8080 npm run dev` t
 ## Features
 
 - Los Angeles, UTC, Kolkata, and Shanghai by default, in that initial order. New clocks are appended to your custom order.
-- iOS-inspired dark cards with a single city/country title and time-zone abbreviation. Tap anywhere on a card to flip to settings; tap the settings background, **Done**, or Escape to return. Controls and drag handles do not trigger a flip.
+- iOS-inspired cards with a single city/country title and time-zone abbreviation. Tap anywhere on a card to flip to settings; tap the settings background, **Done**, or Escape to return. The palette button opens a separate design panel; other controls and drag handles do not trigger the general settings flip.
 - Choose **Dark**, **Light**, or **System** at the bottom of the page. System follows device appearance changes and is the default; the choice is saved on this device when browser storage is available. Clock dial day/night colors still follow each city's local hour. Card backs show the city and a pill-shaped Done button without a redundant settings heading.
 - Search 34,162 cities using names, regional qualifiers, transliterations, and selected aliases; UTC is also searchable.
 - **Use my timezone** in Add Clock suggests a city matching the device's timezone, without location permission or external lookups. Confirm with Add clock, or choose another matching city. It detects existing cities and leaves search available when there is no match.
@@ -30,7 +32,21 @@ Open [the local dashboard](http://127.0.0.1:4173). Use `PORT=8080 npm run dev` t
 
 ## Card size
 
-Choose **Standard cards** or **Mini cards** above the clocks. Mini cards show a denser grid, including two columns on phones, while retaining analog/digital displays, flip settings, dragging, and Time Travel. Settings on mini-card backs scroll when needed. Mini cards are the default. The `view=standard` query parameter saves the larger layout in copied links and browser history; omitting it uses mini cards. Existing `view=mini` links still work. Run `npm run test:mini` for browser checks.
+Choose **Standard cards** or **Mini cards** above the clocks. Mini cards show a denser grid, including two columns on phones, while retaining analog/digital displays, flip settings, dragging, and Time Travel. City names reserve the same two-line space and are vertically centered, keeping clock faces aligned even when names wrap. Settings on mini-card backs scroll when needed. Mini cards are the default. The `view=standard` query parameter saves the larger layout in copied links and browser history; omitting it uses mini cards. Existing `view=mini` links still work. Run `npm run test:mini` for browser checks.
+
+## Card designs
+
+Click the subtle, desaturated **🎨 palette button at the bottom-left of a card's front** to flip to its design settings. Click elsewhere on the front for the usual clock settings.
+
+- Choose **Original, Ocean, Sage, Rose, Lavender, or Sand**. Each palette has coordinated light and dark variants that follow the page's Dark / Light / System setting.
+- Choose a **Solid** or **Gradient** background and a **Classic** or **Minimal** analog dial. Minimal hides the numerals and small tick marks. The dial still switches between day and night colors according to the city's local time.
+- A preview shows the selected palette and background. Choices save immediately to the URL for that clock, survive reordering and reloads, and are included in Copy link. Dial choices are retained while using a digital display.
+- **Reset design** restores that card's original palette, solid background, and classic dial. **Done**, Escape, or the back's background returns to the front.
+- Mini-card palettes show swatches only, with tooltips and accessible names. Standard cards also show the color names. The back scrolls when controls do not fit.
+
+The page-wide **Restore defaults** replaces the clock list, order, formats, and designs with the four original clocks. It retains the selected card size, page appearance, and any frozen Time Travel instant.
+
+Card designs are shared dashboard settings; the page's light/dark appearance is a separate preference saved on the device.
 
 ## Time Travel
 
@@ -42,13 +58,13 @@ Frozen instants are saved in the optional `at` query parameter alongside the com
 
 ## URL format
 
-The URL is the persistent clock configuration; no account is used. Only the device's theme preference is stored locally:
+The URL is the persistent clock configuration; no account is used. Clock order, display formats, and card designs are stored in the fragment; card size and Time Travel use query parameters. The page appearance preference is stored locally, and downloaded app/catalog files are cached for offline use:
 
 ```text
 #v2.2026-10-14.<gzip-base64url-payload>
 ```
 
-The payload stores an ordered array of packed city IDs and display/hour flags. Names and zones come from an immutable static lookup catalog. Fragment data is not sent in HTTP requests, so large dashboards can reload without enlarging the server request URL. The 1,000-clock test link is approximately 5.5 KB.
+The payload stores an ordered array of packed city IDs and display/hour flags, with optional compact per-card design codes. Names and zones come from an immutable static lookup catalog. Fragment data is not sent in HTTP requests, so large dashboards can reload without enlarging the server request URL. An early 1,000-clock test link used approximately 5.5 KB; actual length varies with city IDs, formats, and card designs.
 
 See [URL-FORMAT.md](URL-FORMAT.md) for the exact encoding, versioning, validation, catalog lifecycle, and rendering behavior. The old v1 query format is intentionally unsupported. Malformed links show defaults and an explanatory notice while preserving the original URL. The earlier [scale analysis](URL-SCALE-ANALYSIS.md) records why the format changed.
 
@@ -63,7 +79,7 @@ npm test
 npm run build
 ```
 
-Unit tests cover the catalog, search, duplicates, serialization, malformed URLs, fractional offsets, local dates, clock formats, and northern/southern DST transitions (including Lord Howe’s half-hour shift).
+Unit tests cover the catalog, search, duplicates, URL serialization and validation (including card designs and 1,000+ clocks), explicit gzip loading and JSON fallbacks, drag physics, Time Travel, fractional offsets, local dates, and northern/southern DST transitions (including Lord Howe’s half-hour shift).
 
 The browser suite uses Playwright as an optional development tool. Install it locally, install its Chromium browser, and start `npm run dev` in another terminal:
 
@@ -73,12 +89,17 @@ npx playwright install chromium
 npm run build
 npm run test:browser
 npm run test:scale
+npm run test:travel
+npm run test:mini
+npm run test:design
 npm run test:offline
 ```
 
-Alternatively, set `PLAYWRIGHT_MODULE` to an absolute path to an existing Playwright ESM entry point. `TEST_URL` overrides the default local URL. Screenshots are saved under ignored `test-results/`.
+Alternatively, set `PLAYWRIGHT_MODULE` to an absolute path to an existing Playwright ESM entry point. `TEST_URL` overrides the local URL for interaction, scale, travel, mini, and design suites. The interaction suite also requests its `dist/` subdirectory, so point it at the source development server after building. The offline suite creates its own temporary production server from `dist/` and does not use `TEST_URL`. Screenshots are saved under ignored `test-results/`.
 
 The scale suite opens real 1,000-clock links, verifies bounded rendering and ticking, scrolls and drags through newly mounted rows, and adds past the warning threshold.
+
+The design suite checks separate settings panels, shared design state, reset/history, light/dark variants, accessible focus, and mini/standard palette labels. The mini suite checks layout, dragging, history, mobile sizing, and 1,000 frozen clocks; the travel suite checks frozen instants and DST-aware editing. The offline suite verifies compressed downloads, lazy caching, offline use, and safe worker updates.
 
 The interaction suite checks desktop/mobile layout, keyboard selection, format changes, shared links in a fresh context, history, adding beyond eight clocks, custom ordering, empty states, safe URL text, search errors/retry, and clipboard fallback. Chromium automation does not replace physical-device or VoiceOver/Safari/Firefox testing.
 
@@ -88,7 +109,7 @@ The interaction suite checks desktop/mobile layout, keyboard selection, format c
 npm run build
 ```
 
-Upload the contents of `dist/` to any HTTP(S) static host. The build just copies the application and bundled data; it does not deploy or require a bundler. No route rewrites, secrets, server functions, or runtime API calls are needed. Root URLs and subdirectory URLs such as `/time-dashboard/` both work; preserve the trailing slash for directory URLs and serve standard JavaScript/JSON MIME types.
+Upload the contents of `dist/` to any HTTP(S) static host. The build validates catalog consistency, copies the application and supported data snapshots, generates compressed files and a revisioned service worker, and emits a build manifest and optional host header rules. It does not deploy or require a bundler. No route rewrites, secrets, server functions, or runtime API calls are needed. Root URLs and subdirectory URLs such as `/time-dashboard/` both work; preserve the trailing slash for directory URLs and serve standard JavaScript/JSON MIME types.
 
 The build includes Brotli/gzip variants, cache-header rules, and an offline service worker. The versioned search catalog is loaded only when Add Clock opens and is cached after first use (2.05 MiB explicit gzip download). Production dashboards also save their smaller lookup catalog for offline links. App files are installed for offline reload, with safe updates and scoped cache cleanup. Run `PORT=4174 npm run preview` to verify the built site locally. GitHub Pages needs no custom headers or compression settings: publish the complete `dist/` directory. The app explicitly fetches `.json.gz` catalogs, decompresses them in the browser, and falls back to ordinary JSON when needed. Server-negotiated compression for other assets and custom cache headers remain optional optimizations. See [OFFLINE.md](OFFLINE.md) for deployment, offline limits, update behavior, and tests.
 
@@ -106,6 +127,17 @@ npm run build
 
 Use the actual download date as `YYYY-MM-DD`. Generation filters unsupported zones, retains up to 12 aliases per city, and resolves English country names using Node’s Intl data. The packaged catalog records its source, date, schema, and license. Review catalog changes before publishing an update; coverage reflects the source’s population threshold and capitals, not every settlement.
 
+The page footer credits [shaztech.io](https://shaztech.io/) as the maker and links to GeoNames and its data license.
+
 GeoNames data is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). See [data attribution](data/ATTRIBUTION.md) for modifications and source details.
 
 Compression uses locally vendored [fflate 0.8.3](https://github.com/101arrowz/fflate), under its included [MIT license](src/vendor/fflate.LICENSE). No CDN is contacted.
+
+## Documentation
+
+- [SPEC.md](SPEC.md): implemented behavior and interaction requirements.
+- [URL-FORMAT.md](URL-FORMAT.md): saved clock records, design flags, view and frozen-time parameters, validation, and catalog versions.
+- [OFFLINE.md](OFFLINE.md): build output, GitHub Pages hosting, explicit gzip downloads, cache lifecycle, and offline/update behavior.
+- [URL-SCALE-ANALYSIS.md](URL-SCALE-ANALYSIS.md): historical v1 measurements and the decision to use compact fragments and virtualized rendering.
+
+When changing a feature, update its README instructions and specification, plus the URL or offline document when persistence or loading changes. Keep documented commands aligned with `package.json`; distinguish historical measurements from current guarantees.

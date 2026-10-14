@@ -18,9 +18,19 @@ Use an iOS World Clock-inspired interface, large clocks, centered text, rounded 
 
 Analog clocks maximize the dial and have no visible digital readout; retain a readable time description for assistive technology. Dials are light from 06:00 through 17:59 local time and dark otherwise, independently of page theme. This is a day/night convention, not a sunrise calculation. Digital clocks show seconds and the configured 12/24-hour format.
 
-The page offers Copy times, Copy link, Add clock, explicit time sorting, and Restore defaults. Dark / Light / System is centered at the bottom of the page. System is the default and follows device appearance changes. Save only the theme preference locally; unavailable browser storage must not prevent use.
+The page offers Copy times, Copy link, Add clock, explicit time sorting, and Restore defaults. Restore defaults replaces the list, order, display/hour settings, and designs with the four default clocks while retaining page appearance, card size, and any frozen instant. Dark / Light / System is centered at the bottom of the page. System is the default and follows device appearance changes. Save the page appearance preference locally (clock configuration lives in the URL; offline app/catalog caches are separate); unavailable browser storage must not prevent use.
 
-Tap anywhere on the front of a card to flip to its settings. The back contains the city name, a pill-shaped Done button with a subtle hover highlight, analog/digital and 12/24-hour controls, Move earlier/later, and Remove. Do not show a redundant Clock settings heading. Done, Escape, or tapping the settings background returns to the front. Controls and drag handles do not trigger a flip. Hidden faces are inert and excluded from the accessibility tree.
+Tap anywhere on the front of a card to flip to its settings. The back contains the city name, a pill-shaped Done button with a subtle hover highlight, analog/digital and 12/24-hour controls, Move earlier/later, and Remove. Do not show a redundant Clock settings heading. Done, Escape, or tapping the settings background returns to the front. The palette button opens the design panel described below; other controls and drag handles do not trigger the general settings flip. Hidden faces are inert and excluded from the accessibility tree.
+
+## Per-card design
+
+Place a desaturated 🎨 palette emoji at the bottom-left of every card front, with 40% icon opacity and a 44 px button target. Give it an accessible city-specific label. It opens a separate panel on the back; returning restores focus to the palette button.
+
+Offer Original, Ocean, Sage, Rose, Lavender, and Sand palettes, each with coordinated light/dark variants that follow the resolved page appearance. Allow solid/gradient backgrounds and classic/minimal analog dials; minimal hides numerals and minor tick marks. Keep day/night dial behavior, readable hands and text, digital formatting, and frozen indicators. A small preview reflects palette and background choices. Mini cards show palette swatches with accessible names and tooltips; standard cards also show names.
+
+Save each choice immediately in the clock's URL record. Preserve it through format changes, sorting, dragging, virtualization, history, reload, and sharing. Reset design restores the original palette, solid background, and classic dial for that card. Done, Escape, or background taps return to the front. Retain keyboard focus and keep settings scrollable on small cards.
+
+The browser tab title and page heading are **Time Dashboard**. Credit **Made by shaztech.io** in the footer, alongside the GeoNames/CC BY 4.0 credits, appearance selector, and production offline status.
 
 ## Dragging and ordering
 
@@ -50,7 +60,7 @@ The authoritative format is documented in [URL-FORMAT.md](URL-FORMAT.md):
 #v2.<catalog-version>.<gzip-base64url-payload>
 ```
 
-Pack ordered city IDs and format flags into an integer array, gzip the JSON, and base64url-encode it without padding. Names, countries, and zones come from an immutable versioned static lookup catalog. The fragment is not sent to the host in HTTP requests. No v1 compatibility is required or implemented.
+Pack ordered city IDs and format flags into integer tokens, using `[token, design]` pairs for customized cards; gzip the JSON, and base64url-encode it without padding. Names, countries, and zones come from an immutable versioned static lookup catalog. The fragment is not sent to the host in HTTP requests. No v1 compatibility is required or implemented.
 
 Preserve order, settings, and an explicit empty list across sharing, reload, Back, Forward, and direct fragment navigation. Reject malformed payloads, unavailable versions, unknown/duplicate cities, unsupported zones, and excessive decoded buffers with an explanatory notice. Keep the original URL when falling back to defaults so the user can retry a transient lookup failure. Apply catalog results only if the navigation is still current.
 
@@ -62,10 +72,10 @@ Support 320 px phones, tablets, and desktop layouts with no horizontal overflow.
 
 ## Validation and delivery
 
-- Unit tests: URL packing/compression/validation, 1,000+ record round-trips, catalog integrity, search, duplicate handling, timezone suggestions, DST, fractional offsets, time text, and drag motion.
-- Browser tests: desktop/mobile layout, card settings, theme modes and storage failures, search and retries, copy fallbacks, custom order, pointer/keyboard dragging, cancellation, and history.
+- Unit tests: URL packing/compression/validation, 1,000+ record round-trips, catalog integrity, search, duplicate handling, timezone suggestions, DST, fractional offsets, time text, drag motion, compact card designs, and explicit gzip/JSON fallback handling.
+- Browser tests: desktop/mobile layout, card settings, theme modes and storage failures, search and retries, copy fallbacks, custom order, pointer/keyboard dragging, cancellation, and history. Dedicated mini-card, design, and Time Travel suites cover their layouts, persistence, and controls; the offline suite covers gzip transfers, cache recovery, offline edits, and safe worker updates.
 - Scale tests: real 1,000-clock fragment navigation and reload, bounded mounted cards and time formatting, middle/end scrolling, drag auto-scroll across virtualized rows, full-state edits/order/copy/sort, fresh shared links, 1,001 clocks, soft-cap warning transitions, and mobile width.
-- Build: verify matching search/current lookup catalogs, retain supported immutable lookup versions and vendored license, then copy static assets to `dist/`.
+- Build: verify matching search/current lookup catalogs, retain supported immutable lookup versions and vendored license, then emit static assets, gzip/Brotli variants, a content-hashed service-worker manifest, optional host header rules, and size metadata into `dist/`.
 
 The local browser checks do not replace testing the final deployed URL and real mobile/Safari/Firefox behavior. No deployment or external publication is implied by implementation.
 
@@ -79,7 +89,7 @@ The local browser checks do not replace testing the final deployed URL and real 
 
 ## Mini cards
 
-Provide a page-wide Standard cards / Mini cards selector above the clocks. Mini view uses smaller cards in a denser responsive grid, with two columns on phones. Retain all clock controls, readable digital displays, scrollable settings backs, and Time Travel indicators. Recompute virtualized row geometry and drag targets for the selected layout. Default to mini cards. Persist standard view as `view=standard`, including reload, shared links, and Back/Forward; missing values and existing `view=mini` links use mini cards.
+Provide a page-wide Standard cards / Mini cards selector above the clocks. Mini view uses smaller cards in a denser responsive grid, with two columns on phones. Reserve an equal two-line title space and vertically center city names to align clock faces across wrapped and single-line titles. Retain all clock controls, readable digital displays, scrollable settings backs, and Time Travel indicators. Recompute virtualized row geometry and drag targets for the selected layout. Default to mini cards. Persist standard view as `view=standard`, including reload, shared links, and Back/Forward; missing values and existing `view=mini` links use mini cards.
 
 ## Offline and catalog caching
 

@@ -1,14 +1,16 @@
-# URL configuration at 1,000 clocks
+# URL configuration at 1,000 clocks — historical analysis
 
 **Decision implemented 2026-10-15:** use compact packed IDs/settings, gzip compression, and a URL fragment. Add a 1,000-clock soft-cap warning and virtualized clock rendering. See [the v2 format](URL-FORMAT.md) and [SPEC.md](SPEC.md). The historical measurements below describe the former v1 implementation.
+
+The current format also supports per-card design codes, page-wide mini/standard layout, and frozen Time Travel instants. The figures below predate those additions and are not exact current URL-size or DOM-count promises. Mini cards are now the default; the scale suite explicitly selects standard cards.
 
 The first v2 browser run opened 1,000 clocks normally with HTTP 200 using a 5,501-character link, mounted 12 clock cards, created 2,579 total DOM elements, and made 11 time-formatting calls during the observed tick. It also opened a fresh 1,001-clock link. These are local Chromium measurements, not cross-device guarantees. Reproduce with `npm run test:scale`; current output is in `test-results/scale-results.json`.
 
 The sections below are historical: measured 2026-10-14 against the former v1 implementation. Their recommendations have been superseded by the implemented decision above.
 
-## Conclusion
+## Historical conclusion
 
-The application can encode and parse 1,000 clocks, but the current percent-encoded JSON query is not a reliable shareable URL at that scale. An already-loaded page can save a long URL with the History API; opening or refreshing that same URL sends it to the HTTP server, which can reject it before the application loads. Removing the application clock cap does not remove transport limits.
+The application can encode and parse 1,000 clocks, but the former v1 percent-encoded JSON query is not a reliable shareable URL at that scale. An already-loaded page can save a long URL with the History API; opening or refreshing that same URL sends it to the HTTP server, which can reject it before the application loads. Removing the application clock cap does not remove transport limits.
 
 ## Measurements
 
@@ -28,13 +30,13 @@ The local server uses Node's HTTP defaults. Node documents a default 16 KiB maxi
 
 To isolate rendering from the HTTP rejection, a headless Chromium test intercepted only the document request and supplied the local HTML, retaining the full query and loading normal assets. The page rendered all 1,000 cards in approximately 1.4 seconds, creating 123,100 DOM elements. A performance observer recorded an initial 685 ms long task and subsequent long tasks of approximately 55–86 ms around clock updates. This is one desktop run, not a mobile performance guarantee; rendering all cards is already capable of noticeable stalls.
 
-## Options
+## Historical options
 
 Approximate payload sizes for that same 1,000-city sample:
 
 | Representation | Size |
 | --- | ---: |
-| Current full JSON query URL | 206.4 KB |
+| Former v1 full JSON query URL | 206.4 KB |
 | Full JSON compressed with gzip and encoded as base64url | 26.6 KB |
 | Compact ID/settings JSON query | 19.9 KB |
 | Compact ID/settings tokens | 9.7 KB |
