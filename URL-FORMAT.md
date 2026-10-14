@@ -16,7 +16,7 @@ https://example.com/time-dashboard/#v2.2026-10-14.<payload>
 
 ## Records and ordering
 
-The decompressed JSON is a flat array of nonnegative safe integers, in displayed order. One integer represents one clock:
+The decompressed JSON is an ordered array of clock records. A clock with the original design is a nonnegative safe integer; a customized clock is `[token, design]` as described below. The integer token represents the city and time format:
 
 ```js
 token = cityId * 4 + displayBit + hourBit;
@@ -86,3 +86,9 @@ Freezing, setting a time, and returning to now each create a history entry; retu
 Mini cards are the default. The optional `view=standard` query parameter selects the larger card layout for the entire dashboard. Missing or unrecognized values use mini cards; existing `view=mini` links still work. Switching back to mini removes the parameter. Changing size creates one history entry and preserves the clock fragment and optional frozen `at` instant. Clock edits and Copy link retain the selected view.
 
 Catalogs use immutable versioned URLs, HTTP caching, and deployment-scoped offline Cache Storage. See [OFFLINE.md](OFFLINE.md) for compression, service-worker installation, update policies, and hosting requirements.
+
+## Per-card design extension
+
+A customized clock uses `[token, design]` in the existing ordered v2 payload. Plain integer records remain supported and select the original design. `design` packs a palette index (0 Original, 1 Ocean, 2 Sage, 3 Rose, 4 Lavender, 5 Sand), plus 8 for a gradient background and 16 for a minimal dial. Unused palette values 6/7 and bits above 16 are rejected. For example, `[21473444,25]` is Los Angeles, analog/24-hour, Ocean with a gradient and minimal dial. A zero design is canonically written as a plain token.
+
+The palette button opens a separate design panel on the card back. Choices save immediately, survive reordering, virtualization, reload and history navigation, and are included in Copy link. Reset design restores the original styling. Palettes have coordinated light/dark variants and follow the page's resolved appearance, including system changes; the page appearance preference remains device-local. Original preserves the existing day/night dial treatment, as do the other palettes. Minimal hides numerals and small ticks. The frozen-time indicator remains visible with every palette.

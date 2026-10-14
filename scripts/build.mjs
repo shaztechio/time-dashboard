@@ -42,6 +42,6 @@ for (const file of [...files, 'sw.js'].filter(file => /\.(json|html|js|css|svg)$
 }
 await writeFile(resolve(output, 'build-manifest.json'), JSON.stringify(manifest, null, 2));
 // Hosts supporting _headers can apply this directly when deployed at their root.
-const headers = ['/', '/index.html', '/sw.js', '/styles.css', '/favicon.svg', '/src/*'].map(path => `${path}\n  Cache-Control: no-cache`).concat(catalogs.map(path => `/${path}\n  Cache-Control: public, max-age=31536000, immutable\n  Vary: Accept-Encoding`));
+const headers = ['/', '/index.html', '/sw.js', '/styles.css', '/favicon.svg', '/src/*'].map(path => `${path}\n  Cache-Control: no-cache`).concat(catalogs.flatMap(path => [path, path + '.gz']).map(path => `/${path}\n  Cache-Control: public, max-age=31536000, immutable\n  Vary: Accept-Encoding`));
 await writeFile(resolve(output, '_headers'), headers.join('\n\n') + '\n');
 console.log(`Static site ready in dist/ (${revision}); offline shell and Brotli/gzip variants included.`);

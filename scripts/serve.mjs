@@ -33,7 +33,7 @@ const server = createServer(async (req, res) => {
     }
     body ??= await readFile(file);
     const etag = `"${createHash('sha256').update(body).digest('hex')}"`;
-    const immutable = production && /[/\\](cities|clock-catalog)-\d{4}-\d{2}-\d{2}\.json$/.test(file);
+    const immutable = production && /[/\\](cities|clock-catalog)-\d{4}-\d{2}-\d{2}\.json(?:\.gz)?$/.test(file);
     const headers = { 'Content-Type': types[extname(file)] || 'application/octet-stream', 'Cache-Control': immutable ? 'public, max-age=31536000, immutable' : 'no-cache', ETag: etag };
     if (compressible) headers.Vary = 'Accept-Encoding';
     if (encoding) headers['Content-Encoding'] = encoding;

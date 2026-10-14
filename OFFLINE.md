@@ -11,7 +11,7 @@ The build emits:
 - `sw.js` with a content-derived revision and SHA-256 hashes of the app files.
 - `_headers` for hosts that support that format, and `build-manifest.json` with compression sizes and included assets.
 
-The current search data is 5,335,953 bytes raw, 2,145,547 bytes gzip, or 1,470,602 bytes Brotli. The lookup is 1,707,251 bytes raw, 486,766 bytes gzip, or 351,092 bytes Brotli. These are build measurements; actual transfer depends on host compression configuration.
+The current search data is 5,335,953 bytes raw, 2,145,547 bytes gzip, or 1,470,602 bytes Brotli. The lookup is 1,707,251 bytes raw, 486,766 bytes gzip, or 351,092 bytes Brotli. These are build measurements. The production app explicitly requests the gzip files, so catalog compression does not depend on server negotiation.
 
 ## Hosting headers and compression
 
@@ -19,12 +19,16 @@ The included production preview server negotiates Brotli/gzip from `Accept-Encod
 
 | Resource | Cache-Control |
 | --- | --- |
-| Versioned catalog JSON | `public, max-age=31536000, immutable` |
+| Versioned catalog JSON and `.json.gz` files | `public, max-age=31536000, immutable` |
 | HTML, service worker, unversioned JS/CSS | `no-cache` (with ETag validation) |
 
 Never modify an already published catalog filename. Generate a new dated snapshot and update the current catalog version in the app. Keep supported lookup snapshots available for older v2 links. Search generation uses exclusive creation to prevent accidental overwrite; lookup generation also rejects replacing existing content.
 
-**Deployment matters:** `_headers` is not a universal web-server configuration. Hosts that support it can apply the generated root-relative rules; prefix those paths when deploying under a subdirectory. On other hosts, configure equivalent headers. Enable the host/CDN's Brotli and gzip compression, or configure it to negotiate the supplied `.br`/`.gz` sidecars under the original asset URL. Merely uploading sidecars does not activate compression. Do not serve compressed bytes without the matching Content-Encoding header. The browser still works when a host serves uncompressed JSON, but the initial download is larger. No origin or CDN setting is changed by this repository build.
+**GitHub Pages:** build with `npm run build` and publish the complete `dist/` directory, including `.json.gz` files, using a Pages Actions artifact. No custom headers, proxy, or compression settings are required. GitHub Pages controls HTTP cache headers and does not apply `_headers`. The production loader fetches the versioned `.json.gz` files directly and inflates them with `DecompressionStream('gzip')`. Browsers without that API, missing files, corrupt gzip, or invalid catalog data fall back to the ordinary JSON URL. Both files must be deployed. Source development continues to use plain JSON because compressed files are generated only at build time.
+
+A `.gz` file can be served as an ordinary binary file without a `Content-Encoding` header. The loader also handles hosts that set `Content-Encoding: gzip`: fetch has already decoded the HTTP response, so the loader checks the gzip signature before attempting inflation. Decoded and validated JSON is cached under its canonical `.json` URL. This preserves existing caches, avoids duplicate compressed/decompressed cache entries, and avoids inflating the catalog again on each visit. Search remains lazy. This behavior needs no service-worker change; the worker continues to serve canonical cached JSON and the first compressed request passes through to the host.
+
+For other hosts, `_headers` can apply the generated root-relative rules; prefix paths when deploying under a subdirectory. Server/CDN compression and custom cache headers are optional optimizations. Negotiating the `.br`/`.gz` sidecars under original HTML/JS/CSS/JSON URLs still requires host configuration; merely uploading them does not activate negotiation. Never serve compressed bytes as ordinary JSON without the matching Content-Encoding header. The explicit `.json.gz` catalog route is different: the application decodes that file itself.
 
 For nginx with static compression modules, for example, enable `gzip_static on` and `brotli_static on`, and apply the cache policies above. Module availability depends on that host; automatic CDN compression is also suitable. Do not rewrite missing JSON or worker requests to HTML.
 
@@ -54,6 +58,6 @@ To inspect or reset offline storage, use browser developer tools → Application
 
 ## Verification
 
-After building, run `npm run test:offline` with Playwright available (or set `PLAYWRIGHT_MODULE`). It starts an isolated production fixture and checks Brotli/gzip decoding, ETags/304, cache policy, lazy downloads, first-visit lookup caching, offline links/search/add/Time Travel, subdirectory scope, corrupt-cache recovery, failed installation, waiting upgrades, activation cleanup, and unavailable-storage fallback.
+After building, run `npm run test:offline` with Playwright available (or set `PLAYWRIGHT_MODULE`). It starts an isolated production fixture and checks explicit gzip downloads without Content-Encoding, no duplicate raw catalog downloads, canonical decoded caching, Brotli/gzip negotiation, ETags/304, cache policy, lazy downloads, first-visit lookup caching, offline links/search/add/Time Travel, subdirectory scope, corrupt-cache recovery, failed installation, waiting upgrades, activation cleanup, and unavailable-storage fallback.
 
 Background: [MDN HTTP caching](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching), [MDN service-worker lifecycle](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers), and [Content-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Encoding).

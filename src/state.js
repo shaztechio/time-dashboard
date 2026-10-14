@@ -1,3 +1,4 @@
+import { validDesign } from './design.js';
 import { gzipSync, gunzipSync } from './vendor/fflate.js';
 import { CATALOG_VERSION, CATALOG_VERSIONS } from './catalog.js';
 export const SOFT_CLOCK_LIMIT = 1000;
@@ -39,16 +40,17 @@ export function validateClocks(clocks) {
   if (!Array.isArray(clocks)) throw new Error('Invalid clocks');
   const ids = new Set();
   return clocks.map((clock) => {
-    if (!clock || typeof clock !== 'object' || Array.isArray(clock) || Object.keys(clock).length !== keys.length || keys.some((key) => !Object.hasOwn(clock, key))) throw new Error('Invalid clock fields');
+    if (!clock || typeof clock !== 'object' || Array.isArray(clock) || Object.keys(clock).some(key => !keys.includes(key) && key !== 'design') || keys.some((key) => !Object.hasOwn(clock, key))) throw new Error('Invalid clock fields');
     if (!boundedString(clock.id, 80) || !/^(utc|preset:(pacific|india|china)|geonames:[1-9][0-9]*)$/.test(clock.id)) throw new Error('Invalid clock ID');
     if (!boundedString(clock.label, 100) || !boundedString(clock.place, 160, true)) throw new Error('Invalid label');
     if (!boundedString(clock.zone, 100) || !/^(UTC|[A-Za-z_+-]+(?:\/[A-Za-z0-9_+.-]+)+)$/.test(clock.zone) || !supportsZone(clock.zone)) throw new Error('Unsupported time zone');
     if (clock.id === 'utc' && clock.zone !== 'UTC') throw new Error('Invalid UTC clock');
     if (!['analog', 'digital'].includes(clock.display) || ![12, 24].includes(clock.hours)) throw new Error('Invalid clock format');
+    if (Object.hasOwn(clock, 'design') && !validDesign(clock.design)) throw new Error('Invalid card design');
     const id = cityIdentity(clock);
     if (ids.has(id)) throw new Error('Duplicate city');
     ids.add(id);
-    return Object.fromEntries(keys.map((key) => [key, clock[key]]));
+    return { ...Object.fromEntries(keys.map((key) => [key, clock[key]])), ...(clock.design ? { design: clock.design } : {}) };
   });
 }
 // CRC validation also detects truncated/corrupted compressed links.
@@ -84,7 +86,9 @@ export function decodeTokens(url) {
   const tokens = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(raw));
   if (!Array.isArray(tokens)) throw new Error('Invalid clock records.');
   const seen = new Set();
-  for (const token of tokens) {
+  for (const entry of tokens) {
+    if (Array.isArray(entry) && (entry.length !== 2 || !validDesign(entry[1]))) throw new Error('Invalid card design record.');
+    const token = Array.isArray(entry) ? entry[0] : entry;
     if (!Number.isSafeInteger(token) || token < 0) throw new Error('Invalid clock record.');
     const id = Math.floor(token / 4);
     if (seen.has(id)) throw new Error('Duplicate city in clock link.');
@@ -96,11 +100,13 @@ export function readState(url, catalog) {
   try {
     const tokens = decodeTokens(url);
     if (tokens === null) return { clocks: defaults(), error: false };
-    const records = tokens.map(token => {
+    const records = tokens.map(entry => {
+      const token = Array.isArray(entry) ? entry[0] : entry;
+      const design = Array.isArray(entry) ? entry[1] : 0;
       const id = Math.floor(token / 4);
       const record = catalog?.get(id);
       if (!record) throw new Error(`City ${id} is not in this link's catalog.`);
-      return { ...record, display: token % 2 ? 'digital' : 'analog', hours: (token & 2) ? 12 : 24 };
+      return { ...record, ...(design ? { design } : {}), display: token % 2 ? 'digital' : 'analog', hours: (token & 2) ? 12 : 24 };
     });
     return { clocks: validateClocks(records), error: false };
   } catch (error) { return { clocks: defaults(), error: true, message: error.message }; }
@@ -112,7 +118,7 @@ export function stateURL(url, clocks) {
     const id = identity === 'utc' ? 0 : Number(identity.split(':')[1]);
     const token = id * 4 + (clock.display === 'digital' ? 1 : 0) + (clock.hours === 12 ? 2 : 0);
     if (!Number.isSafeInteger(token)) throw new Error('Invalid city ID.');
-    return token;
+    return clock.design ? [token, clock.design] : token;
   });
   const raw = new TextEncoder().encode(JSON.stringify(tokens));
   if (raw.length > MAX_DECODED_BYTES) throw new Error('Clock link exceeds the decoded size limit.');

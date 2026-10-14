@@ -57,3 +57,18 @@ test('clock validation still rejects invalid fields, settings, and duplicates', 
   const clock = defaults()[0];
   for (const records of [null, [null], [clock, clock], [{ ...clock, hours: 13 }], [{ ...clock, zone: 'Invalid/Zone' }], [{ ...clock, display: 'sun' }], [{ ...clock, extra: true }]]) assert.throws(() => validateClocks(records));
 });
+
+test('per-card designs survive sharing, formats, ordering, and 1000-clock links', () => {
+  const clocks = sample(1000).map((clock, i) => ({ ...clock, design: i % 6 + (i % 2 ? 8 : 0) + (i % 3 ? 16 : 0) }));
+  const normalized = validateClocks(clocks);
+  const url = stateURL(base, clocks);
+  assert.deepEqual(readState(url, catalog).clocks, normalized);
+  assert.deepEqual(readState(stateURL(base, clocks.toReversed()), catalog).clocks, normalized.toReversed());
+  assert.ok(url.length < 16000);
+  for (const design of [-1, 6, 7, 30, 32, 1.5, '1', null]) {
+    assert.throws(() => validateClocks([{ ...defaults()[0], design }]));
+    assert.equal(readState(packed([[0, design]]), catalog).error, true);
+  }
+  for (const tokens of [[[0]], [[0, 1, 2]], [[0, 1], 0], [[[], 1]]]) assert.equal(readState(packed(tokens), catalog).error, true);
+  assert.deepEqual(readState(packed([0, [5100016, 9]]), catalog).clocks.map(c => c.design || 0), [0, 9]);
+});
