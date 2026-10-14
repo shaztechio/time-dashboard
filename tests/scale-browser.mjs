@@ -1,0 +1,145 @@
+import assert from 'node:assert/strict';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { performance } from 'node:perf_hooks';
+import { stateURL, readState } from '../src/state.js';
+import { clockCatalog } from '../src/catalog.js';
+const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const base = process.env.TEST_URL || 'http://127.0.0.1:4173/';
+const catalog = clockCatalog(JSON.parse(await readFile(new URL('../data/clock-catalog-2026-10-14.json', import.meta.url))));
+const clocks = [...catalog.values()].slice(0, 1000).map((clock, i) => ({ ...clock, display: 'analog', hours: i % 2 ? 12 : 24 }));
+const url = stateURL(base, clocks);
+const browser = await chromium.launch({ headless: true });
+await mkdir('test-results', { recursive: true });
+const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, colorScheme: 'dark' });
+const page = await context.newPage();
+const errors = [];
+const navigationURLs = [];
+page.on('pageerror', error => errors.push(error.message));
+page.on('request', request => { if (request.isNavigationRequest()) navigationURLs.push(request.url()); });
+await page.addInitScript(() => {
+  window.partsCalls = 0;
+  window.longTasks = [];
+  const original = Intl.DateTimeFormat.prototype.formatToParts;
+  Intl.DateTimeFormat.prototype.formatToParts = function(...args) { window.partsCalls++; return original.apply(this, args); };
+  new PerformanceObserver(list => window.longTasks.push(...list.getEntries().map(entry => Math.round(entry.duration)))).observe({ type: 'longtask', buffered: true });
+});
+const saved = () => readState(page.url(), catalog).clocks;
+const card = id => page.locator(`.clock-card[data-id="${id}"]`);
+async function reveal(id) {
+  await page.locator(`.clock-slot[data-id="${id}"]`).scrollIntoViewIfNeeded();
+  await card(id).waitFor();
+}
+try {
+  const start = performance.now();
+  const response = await page.goto(url);
+  assert.equal(response.status(), 200);
+  await page.waitForFunction(() => document.querySelectorAll('.clock-slot').length === 1000 && document.querySelector('.clock-card'));
+  const readyMs = Math.round(performance.now() - start);
+  assert.deepEqual(saved(), clocks);
+  assert.equal(await page.locator('#scale-warning').isVisible(), true);
+  const mounted = await page.locator('.clock-card').count();
+  const nodes = await page.locator('*').count();
+  assert.ok(mounted <= 32, `${mounted} mounted clocks`);
+  assert.ok(nodes < 8000, `${nodes} DOM elements`);
+  const before = await page.evaluate(() => window.partsCalls);
+  const second = await page.locator('.time-seconds').first().textContent();
+  await page.waitForFunction(value => document.querySelector('.time-seconds').textContent !== value, second);
+  const tickCalls = await page.evaluate(() => window.partsCalls) - before;
+  assert.ok(tickCalls <= 64, `Tick formatted ${tickCalls} times`);
+  await page.screenshot({ path: 'test-results/1000-clocks-top.png' });
+  // Drag through newly mounted rows while auto-scrolling; the source stays alive.
+  const startHandle = await card(clocks[0].id).locator('.reorder-handle').boundingBox();
+  await page.mouse.move(startHandle.x + 22, startHandle.y + 22);
+  await page.mouse.down();
+  await page.mouse.move(startHandle.x + 22, 980, { steps: 12 });
+  await page.waitForFunction(() => scrollY > 650);
+  assert.ok(await page.locator('.clock-card').count() <= 33);
+  await page.mouse.move(700, 500);
+  const drop = await page.locator('.clock-slot:not(.card-placeholder)').evaluateAll(elements => {
+    const slot = elements.find(el => { const rect = el.getBoundingClientRect(); return rect.top + 120 > 200 && rect.top + 120 < 800; });
+    const rect = slot.getBoundingClientRect();
+    return { x: rect.left + rect.width / 2, y: rect.top + 120 };
+  });
+  await page.mouse.move(drop.x, drop.y, { steps: 5 });
+  await page.mouse.up();
+  await page.waitForSelector('.dragging', { state: 'detached' });
+  assert.ok(saved().findIndex(clock => clock.id === clocks[0].id) >= 4);
+  assert.equal(new Set(saved().map(clock => clock.id)).size, 1000);
+  await page.goto(url);
+  await page.reload();
+  await page.waitForFunction(id => document.querySelector('.clock-slot')?.dataset.id === id, clocks[0].id);
+  await reveal(clocks[500].id);
+  assert.ok(await page.locator('.clock-card').count() <= 32);
+  assert.equal(await card(clocks[0].id).count(), 0);
+  await reveal(clocks[999].id);
+  assert.ok(await page.locator('.clock-card').count() <= 32);
+  await card(clocks[999].id).locator('.flip-open').click();
+  await card(clocks[999].id).getByRole('button', { name: 'Digital', exact: true }).click();
+  assert.equal(saved()[999].display, 'digital');
+  await card(clocks[999].id).locator('.flip-close').click();
+  await card(clocks[999].id).locator('.reorder-handle').press('ArrowLeft');
+  assert.equal(saved()[998].id, clocks[999].id);
+  await page.goBack();
+  await page.waitForFunction(id => document.querySelector('.clock-slot:last-child')?.dataset.id === id, clocks[999].id);
+  await reveal(clocks[999].id);
+  // Move between visible slots at the far end of the full list.
+  const from = await card(clocks[999].id).locator('.reorder-handle').boundingBox();
+  const to = await page.locator(`.clock-slot[data-id="${clocks[998].id}"]`).boundingBox();
+  const history = await page.evaluate(() => window.history.length);
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(to.x + to.width / 2, to.y + 130, { steps: 12 });
+  await page.mouse.up();
+  await page.waitForSelector('.dragging', { state: 'detached' });
+  assert.equal(saved()[998].id, clocks[999].id);
+  // pushState after Back replaces the forward entry rather than growing history.
+  assert.equal(await page.evaluate(() => window.history.length), history);
+  await page.reload();
+  await page.waitForFunction(() => document.querySelectorAll('.clock-slot').length === 1000);
+  assert.equal(saved()[998].id, clocks[999].id);
+  await page.locator('#sort-descending').click();
+  assert.equal(saved().length, 1000);
+  await page.evaluate(() => Object.defineProperty(navigator, 'clipboard', { value: { writeText: async text => { window.copied = text; } }, configurable: true }));
+  await page.locator('#copy-times').click();
+  assert.equal((await page.evaluate(() => window.copied)).split('\n').length, 1000);
+  // Remove to fall below the warning threshold, then add past it without blocking.
+  const removed = saved()[0];
+  await reveal(removed.id);
+  await card(removed.id).locator('.flip-open').click();
+  await card(removed.id).locator('.remove').click();
+  assert.equal(saved().length, 999);
+  assert.equal(await page.locator('#scale-warning').isHidden(), true);
+  const initialIds = new Set(clocks.map(clock => clock.id));
+  const extras = [...catalog.values()].filter(clock => clock.id !== 'utc' && !initialIds.has(clock.id)).slice(0, 2);
+  for (const extra of extras) {
+    await page.locator('#add-clock').click();
+    assert.equal(await page.locator('#add-scale-warning').isVisible(), true);
+    await page.locator('#city-search').fill(extra.label);
+    await page.locator(`.city-option[data-city-id="${extra.id}"]`).click();
+    await page.locator('#confirm-add').click();
+  }
+  assert.equal(saved().length, 1001);
+  assert.equal(await page.locator('#scale-warning').isHidden(), false);
+  const shared = page.url();
+  const fresh = await context.newPage();
+  const freshResponse = await fresh.goto(shared);
+  assert.equal(freshResponse.status(), 200);
+  await fresh.waitForFunction(() => document.querySelectorAll('.clock-slot').length === 1001);
+  assert.ok(await fresh.locator('.clock-card').count() <= 32);
+  await fresh.close();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await reveal(saved().at(-1).id);
+  await page.waitForFunction(() => [...document.querySelectorAll('.clock-slot')].every(slot => {
+    const rect = slot.getBoundingClientRect();
+    return rect.bottom <= 0 || rect.top >= innerHeight || slot.querySelector('.clock-card');
+  }));
+  assert.ok(await page.locator('.clock-card').count() <= 10);
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  await page.screenshot({ path: 'test-results/1000-clocks-mobile.png' });
+  assert.ok(navigationURLs.every(value => value.length < 200), 'Fragment must stay out of the HTTP request');
+  assert.deepEqual(errors, []);
+  const result = { clocks: 1000, urlCharacters: url.length, httpStatus: response.status(), readyMs, mountedCards: mounted, totalDOMElements: nodes, formatToPartsCallsPerTick: tickCalls, navigationURLs, longTasksAfterReload: await page.evaluate(() => window.longTasks), beyondSoftCap: 1001 };
+  await writeFile('test-results/scale-results.json', JSON.stringify(result, null, 2));
+  console.log(JSON.stringify(result, null, 2));
+  console.log('PASS 1000-clock loading, bounded rendering/ticking, scroll, formats, keyboard/drag order, history, sorting, copy, soft cap, fresh links, and mobile.');
+} finally { await browser.close(); }

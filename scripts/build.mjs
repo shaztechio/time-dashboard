@@ -1,0 +1,12 @@
+import { cp, mkdir, rm, readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { CATALOG_VERSION, CATALOG_VERSIONS } from '../src/catalog.js';
+const search = JSON.parse(await readFile('data/cities.json', 'utf8'));
+const lookup = JSON.parse(await readFile(`data/clock-catalog-${CATALOG_VERSION}.json`, 'utf8'));
+if (search.snapshot !== CATALOG_VERSION || JSON.stringify(lookup.cities) !== JSON.stringify(search.cities.map(([id, name, , country, zone]) => [id, name, country, zone]))) throw new Error('Search and URL lookup catalogs must match the current catalog version');
+for (const version of CATALOG_VERSIONS) await readFile(`data/clock-catalog-${version}.json`);
+const output = resolve('dist');
+await rm(output, { recursive: true, force: true });
+await mkdir(output, { recursive: true });
+for (const file of ['index.html', 'styles.css', 'favicon.svg', 'src', 'data']) await cp(file, resolve(output, file), { recursive: true });
+console.log('Static site ready in dist/');

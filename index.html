@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Your world, at a glance. A simple, shareable dashboard of live clocks around the world.">
+  <title>World Clock</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <script src="./src/theme.js"></script>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./src/app.js"></script>
+</head>
+<body>
+  <button class="skip-link" type="button">Skip to clocks</button>
+  <div class="page">
+    <header class="site-header">
+      <div class="heading"><h1>World Clock</h1><div class="header-meta"><span id="clock-count">4 clocks</span><span aria-hidden="true">·</span><time id="utc-today"></time><span>UTC</span></div></div>
+      <div class="toolbar-actions"><button id="time-travel" class="button secondary" aria-pressed="false" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2M3 3v5h5"/></svg>Time Travel</button><button id="copy-times" class="button secondary"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V3H3v13h5"/></svg><span>Copy times</span></button><button id="copy-link" class="button secondary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5H5v15h14V5h-3M12 15V2m-4 4 4-4 4 4"/></svg><span>Copy link</span></button><button id="add-clock" class="button primary"><span aria-hidden="true">＋</span> Add clock</button></div>
+    </header>
+    <main>
+      <aside id="frozen-banner" class="frozen-banner" aria-label="Time Travel is active" hidden>
+        <div><strong><span aria-hidden="true">Ⅱ</span> Time is frozen</strong><time id="frozen-instant"></time></div>
+        <div class="travel-actions"><button id="adjust-time" class="button secondary">Adjust time</button><button id="resume-time" class="button primary">Return to now <span aria-hidden="true">↗</span></button></div>
+      </aside>
+      <div id="notice" class="notice" role="alert" hidden>This link couldn’t be loaded. Showing the default clocks. Restore defaults or make a change to start a new link.</div>
+      <div id="scale-warning" class="notice" role="status" hidden>You have 1,000 or more clocks. Large dashboards may be slower to sort, copy, or share on some devices. You can continue adding clocks.</div>
+      <section aria-labelledby="clocks-title">
+        <h2 id="clocks-title" class="sr-only">Your clocks</h2>
+        <div class="view-controls segments" role="group" aria-label="Card size"><button type="button" data-card-view="standard" aria-pressed="true">Standard cards</button><button type="button" data-card-view="mini" aria-pressed="false">Mini cards</button></div>
+        <div class="sort-controls" role="group" aria-label="Sort clocks"><button id="sort-ascending">Earliest to latest ↑</button><button id="sort-descending">Latest to earliest ↓</button></div>
+        <div id="clocks" class="clock-grid" role="list" aria-label="Clocks" tabindex="-1"></div>
+        <div id="empty" class="empty" hidden><div class="empty-icon" aria-hidden="true">◷</div><h3>No clocks yet.</h3><p>Add a city to get started.</p><button id="empty-add" class="button primary">＋ Add clock</button></div>
+        <div class="dashboard-bottom"><p>Tap a card for settings <span class="separator">·</span> Drag the handle to reorder</p><button id="restore" class="text-button">Restore defaults <span aria-hidden="true">↺</span></button></div>
+      </section>
+    </main>
+    <footer><p>City data by <a href="https://www.geonames.org/" target="_blank" rel="noreferrer">GeoNames</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a></p>
+      <div class="theme-controls segments" role="group" aria-label="Color theme"><button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button><button type="button" data-theme-choice="light" aria-pressed="false">Light</button><button type="button" data-theme-choice="system" aria-pressed="true">System</button></div>
+    </footer>
+  </div>
+
+  <dialog id="city-dialog" aria-labelledby="dialog-title">
+    <form id="city-form">
+      <div class="dialog-heading"><div><h2 id="dialog-title">Add a clock</h2></div><button type="button" id="close-dialog" class="icon-button" aria-label="Close city search">×</button></div>
+      <div class="timezone-shortcut"><button type="button" id="use-timezone" class="button secondary">Use my timezone</button><p id="timezone-status" class="helper" role="status">Uses your device’s timezone, not your location.</p></div>
+      <label for="city-search">Find a city</label>
+      <div class="search-box"><span aria-hidden="true">⌕</span><input id="city-search" type="search" placeholder="Try London, Tokyo, or New York…" role="combobox" aria-autocomplete="list" aria-controls="city-results" aria-expanded="true" autocomplete="off" spellcheck="false" maxlength="100"></div>
+      <div class="results-heading"><span id="results-label">POPULAR PLACES</span><span id="search-status" role="status"></span></div>
+      <div id="city-results" class="results" role="listbox" aria-label="Cities"></div>
+      <div id="search-error" class="search-error" hidden><p>We couldn’t load the city list. Your existing clocks are still available.</p><button type="button" id="retry-search" class="button secondary">Try again</button></div>
+      <div id="selection" class="selection">Select a city to continue</div>
+      <p id="add-scale-warning" class="helper" role="status" hidden>1,000 clocks is the recommended maximum. You can add more, but sorting, copying, or sharing may be slower.</p>
+      <div class="dialog-settings">
+        <fieldset><legend>Clock style</legend><div class="segments"><label><input type="radio" name="display" value="digital"><span>Digital</span></label><label><input type="radio" name="display" value="analog" checked><span>Analog</span></label></div></fieldset>
+        <fieldset><legend>Time format</legend><div class="segments"><label><input type="radio" name="hours" value="12"><span>12-hour</span></label><label><input type="radio" name="hours" value="24" checked><span>24-hour</span></label></div></fieldset>
+      </div>
+      <div class="dialog-footer"><button type="button" id="cancel-dialog" class="button secondary">Cancel</button><button id="confirm-add" class="button primary" disabled>Add clock <span aria-hidden="true">＋</span></button></div>
+    </form>
+  </dialog>
+  <dialog id="travel-dialog" aria-labelledby="travel-title">
+    <form id="travel-form">
+      <div class="dialog-heading"><h2 id="travel-title">Time Travel</h2><button type="button" id="close-travel" class="icon-button" aria-label="Close Time Travel">×</button></div>
+      <p class="travel-intro">One moment. Everywhere.<br><span>Freeze now, or choose a time to see it across your world.</span></p>
+      <button type="button" id="freeze-now" class="button secondary">Ⅱ Freeze now</button>
+      <div class="travel-fields">
+        <label for="travel-zone">Set time in</label><select id="travel-zone"></select>
+        <label for="travel-datetime">Date and time</label><input id="travel-datetime" type="datetime-local" step="1" min="1000-01-01T00:00" max="9999-12-31T23:59:59" required aria-describedby="travel-error travel-preview">
+        <div id="travel-fold" hidden><label for="travel-occurrence">This time occurs twice. Choose which one.</label><select id="travel-occurrence"></select></div>
+      </div>
+      <p id="travel-error" class="travel-error" role="alert" hidden>Enter a valid date and time. If the clocks jump forward in this timezone, choose a time outside that gap.</p>
+      <div class="travel-steps" role="group" aria-label="Adjust selected time"><button type="button" data-time-shift="-24">−1 day</button><button type="button" data-time-shift="-1">−1 hour</button><button type="button" data-time-shift="1">+1 hour</button><button type="button" data-time-shift="24">+1 day</button></div>
+      <p id="travel-preview" class="helper" aria-live="polite"></p>
+      <p class="helper">All clocks will pause at this instant. Your link will save it too.</p>
+      <div class="dialog-footer"><button type="button" id="cancel-travel" class="button secondary">Cancel</button><button id="travel-apply" class="button primary">Set time &amp; freeze</button></div>
+    </form>
+  </dialog>
+  <dialog id="share-dialog" aria-labelledby="share-title"><div class="dialog-heading"><h2 id="share-title">Your dashboard link</h2><button id="close-share" class="icon-button" aria-label="Close link dialog">×</button></div><label for="share-url">Copy this link to share your clocks</label><textarea id="share-url" rows="5" readonly></textarea><p class="helper">Anyone with this link can open the same clocks and settings.</p></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <noscript><p class="notice">Please enable JavaScript to display live clocks and search for cities.</p></noscript>
+</body>
+</html>

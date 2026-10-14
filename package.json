@@ -1,0 +1,16 @@
+{
+  "name": "time-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.js",
+    "test:browser": "node tests/browser.mjs",
+    "test:scale": "node tests/scale-browser.mjs",
+    "catalog": "node scripts/build-catalog.mjs",
+    "build": "node scripts/build.mjs",
+    "test:travel": "node tests/travel-browser.mjs",
+    "test:mini": "node tests/mini-browser.mjs"
+  }
+}
