@@ -72,8 +72,21 @@ try {
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   await card.locator('.flip-close').click();
   await card.locator('.design-open').click();
-  await card.locator('.flip-close').scrollIntoViewIfNeeded();
+  const back = card.locator('.card-back');
+  await back.evaluate(el => { el.scrollTop = el.scrollHeight; });
+  await page.waitForFunction(() => document.querySelector('.card-rotator').getAnimations().every(animation => animation.playState !== 'running'));
+  assert.ok(await back.evaluate(el => el.scrollTop > 0), 'Design controls should scroll on narrow cards');
+  const doneBox = await card.locator('.flip-close').boundingBox();
+  const backBox = await back.boundingBox();
+  assert.ok(doneBox.y >= backBox.y && doneBox.y + doneBox.height <= backBox.y + 56, 'Done stays at the top while settings scroll');
+  assert.ok(doneBox.height <= 34 && doneBox.width < 65, 'Done stays compact on mobile');
+  assert.equal(await card.locator('.flip-close').evaluate(el => {
+    const box = el.getBoundingClientRect();
+    return el.contains(document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2));
+  }), true, 'Scrolled settings must not cover Done');
   await page.screenshot({ path: 'test-results/card-designs-mobile.png' });
+  await card.locator('.flip-close').click();
+  assert.equal(await card.getAttribute('data-flipped'), 'false');
   assert.deepEqual(errors, []);
   console.log('PASS card designs: separate panels, URL persistence, reset/history, light/dark, formats, keyboard focus, 320px controls.');
 } finally { await browser.close(); }

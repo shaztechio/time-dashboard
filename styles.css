@@ -328,6 +328,8 @@ body[data-card-view="mini"] .card-back .settings-city { margin-bottom: 12px; }
 body[data-card-view="mini"] .card-back .segments button { font-size: 11px; }
 body[data-card-view="mini"] .card-back .remove { flex-shrink: 0; }
 @media (max-width: 640px) {
+  .card-back .card-top { position: sticky; top: 0; z-index: 3; min-height: 40px; margin-bottom: 4px; background: var(--surface); box-shadow: 0 -12px 0 var(--surface); }
+  .card-back .flip-close { min-height: 32px; padding: 6px 12px; border-radius: 16px; font-size: 12px; }
   body[data-card-view="mini"] .page { padding-inline: 12px; }
   body[data-card-view="mini"] .clock-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; --mini-card-extra-height: 136px; }
   body[data-card-view="mini"] .card-front { padding-inline: 8px; }
