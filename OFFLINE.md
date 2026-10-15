@@ -2,7 +2,7 @@
 
 ## Build and preview
 
-This repository deploys through [.github/workflows/pages.yml](.github/workflows/pages.yml) on pushes to `main` or manual dispatch. It runs unit tests and the production build, then uploads `dist/` as the Pages artifact. The website URL is https://shaztechio.github.io/time-dashboard/. Repository Pages settings use the GitHub Actions publishing source.
+This repository deploys through [.github/workflows/pages.yml](.github/workflows/pages.yml) on pushes to `main` or manual dispatch. It runs unit tests and the production build, then uploads `dist/` as the Pages artifact. The website URL is https://timedashboard.app/. Repository Pages settings use the GitHub Actions publishing source.
 
 Run `npm run build`, then `PORT=4174 npm run preview`. Deploy the complete `dist/` directory over HTTPS (localhost also supports service workers). Plain `npm run dev` deliberately leaves persistent catalog caching and worker registration disabled, so local edits and error tests are not hidden behind old cached files.
 

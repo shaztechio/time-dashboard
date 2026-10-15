@@ -111,7 +111,7 @@ Screenshots and logs are uploaded as per-suite artifacts for seven days, includi
 
 ## Static deployment
 
-The repository uses [GitHub Pages](https://shaztechio.github.io/time-dashboard/) with the [Deploy GitHub Pages workflow](.github/workflows/pages.yml). Every push to `main` runs the unit tests, builds the production site with Node.js 22, and publishes only `dist/`. You can also run the workflow manually from the repository's Actions tab. GitHub Pages must use **GitHub Actions** as its publishing source.
+The repository uses [GitHub Pages](https://timedashboard.app/) with the [Deploy GitHub Pages workflow](.github/workflows/pages.yml). Every push to `main` runs the unit tests, builds the production site with Node.js 22, and publishes only `dist/`. You can also run the workflow manually from the repository's Actions tab. GitHub Pages must use **GitHub Actions** as its publishing source.
 
 ```sh
 npm run build
@@ -121,11 +121,11 @@ Upload the contents of `dist/` to any HTTP(S) static host. The build validates c
 
 The build includes Brotli/gzip variants, cache-header rules, and an offline service worker. The versioned search catalog is loaded only when Add Clock opens and is cached after first use (2.05 MiB explicit gzip download). Production dashboards also save their smaller lookup catalog for offline links. App files are installed for offline reload, with safe updates and scoped cache cleanup. Run `PORT=4174 npm run preview` to verify the built site locally. GitHub Pages needs no custom headers or compression settings: publish the complete `dist/` directory. The app explicitly fetches `.json.gz` catalogs, decompresses them in the browser, and falls back to ordinary JSON when needed. Server-negotiated compression for other assets and custom cache headers remain optional optimizations. See [OFFLINE.md](OFFLINE.md) for deployment, offline limits, update behavior, and tests.
 
-For the planned `timedashboard.app` custom domain, use the [Cloudflare DNS import file and setup instructions](dns/README.md). Importing DNS and configuring the Pages custom domain are separate from publishing the build.
+For the `timedashboard.app` custom domain, use the [Cloudflare DNS import file and setup instructions](dns/README.md). Importing DNS and configuring the Pages custom domain are separate from publishing the build.
 
 ## Link previews
 
-The HTML includes OpenGraph and Twitter large-image metadata with a 1200 × 630 PNG preview, title, description, and canonical URL. These tags are present before JavaScript runs. Pages builds take their absolute URLs from the configured Pages `base_url`; after changing the custom domain, rerun the deployment workflow to update the tags. Local builds default to the GitHub Pages URL; override it with `SITE_URL=https://timedashboard.app/ npm run build`.
+The HTML includes OpenGraph and Twitter large-image metadata with a 1200 × 630 PNG preview, title, description, and canonical URL. These tags are present before JavaScript runs. Pages builds take their absolute URLs from the configured Pages `base_url` and normalize them to HTTPS; after changing the custom domain, rerun the deployment workflow to update the tags. Local builds default to the GitHub Pages URL; override it with `SITE_URL=https://timedashboard.app/ npm run build`.
 
 The preview is intentionally generic: URL fragments containing personal clock settings never reach a social crawler. Edit `assets/social-preview.svg`, then run `npm ci`, `npx playwright install chromium`, and `npm run social:preview` to regenerate the checked-in `social-preview.png`. Regular builds copy the PNG without requiring a browser.
 

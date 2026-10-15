@@ -31,6 +31,8 @@ for (const file of ['LICENSE', 'index.html', 'styles.css', 'favicon.svg', 'socia
 const defaultSiteURL = 'https://shaztechio.github.io/time-dashboard/';
 const siteURL = new URL(process.env.SITE_URL || defaultSiteURL);
 if (!['https:', 'http:'].includes(siteURL.protocol) || siteURL.username || siteURL.password) throw new Error('SITE_URL must be an HTTP(S) URL without credentials');
+// Pages may report HTTP until HTTPS enforcement is enabled for a new domain.
+siteURL.protocol = 'https:';
 siteURL.search = ''; siteURL.hash = '';
 if (!siteURL.pathname.endsWith('/')) siteURL.pathname += '/';
 const escapedSiteURL = siteURL.href.replaceAll('&', '&amp;').replaceAll('"', '&quot;');
