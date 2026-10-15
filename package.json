@@ -15,7 +15,8 @@
     "test:mini": "node tests/mini-browser.mjs",
     "preview": "SERVE_DIR=dist node scripts/serve.mjs",
     "test:offline": "node tests/offline-browser.mjs",
-    "test:design": "node tests/design-browser.mjs"
+    "test:design": "node tests/design-browser.mjs",
+    "social:preview": "node scripts/build-social-preview.mjs"
   },
   "devDependencies": {
     "playwright": "1.64.1"

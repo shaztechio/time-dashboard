@@ -1,0 +1,108 @@
+<!--
+SPDX-License-Identifier: Apache-2.0
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<rect width="1200" height="630" fill="#0b0c10"/>
+<g font-family="Arial, sans-serif">
+<text x="64" y="87" fill="#f5f5f7" font-size="48" font-weight="700">Time Dashboard</text>
+<text x="66" y="127" fill="#a7a9b5" font-size="24">Your world, at a glance.</text>
+<text x="1136" y="82" fill="#c7c9d3" text-anchor="end" font-size="20">shaztech.io</text>
+<g transform="translate(64 173)">
+<rect width="250" height="334" rx="24" fill="#1b303d"/>
+<text x="125" y="42" text-anchor="middle" fill="#f5f5f7" font-size="21" font-weight="600">Los Angeles</text>
+<text x="125" y="69" text-anchor="middle" fill="#7dd3fc" font-size="14">PDT</text>
+<circle cx="125" cy="190" r="89" fill="#f5f5f7"/>
+<line x1="125.00" y1="112.00" x2="125.00" y2="107.00" stroke="#60616a" stroke-width="2"/>
+<line x1="164.00" y1="122.45" x2="166.50" y2="118.12" stroke="#60616a" stroke-width="2"/>
+<line x1="192.55" y1="151.00" x2="196.88" y2="148.50" stroke="#60616a" stroke-width="2"/>
+<line x1="203.00" y1="190.00" x2="208.00" y2="190.00" stroke="#60616a" stroke-width="2"/>
+<line x1="192.55" y1="229.00" x2="196.88" y2="231.50" stroke="#60616a" stroke-width="2"/>
+<line x1="164.00" y1="257.55" x2="166.50" y2="261.88" stroke="#60616a" stroke-width="2"/>
+<line x1="125.00" y1="268.00" x2="125.00" y2="273.00" stroke="#60616a" stroke-width="2"/>
+<line x1="86.00" y1="257.55" x2="83.50" y2="261.88" stroke="#60616a" stroke-width="2"/>
+<line x1="57.45" y1="229.00" x2="53.12" y2="231.50" stroke="#60616a" stroke-width="2"/>
+<line x1="47.00" y1="190.00" x2="42.00" y2="190.00" stroke="#60616a" stroke-width="2"/>
+<line x1="57.45" y1="151.00" x2="53.12" y2="148.50" stroke="#60616a" stroke-width="2"/>
+<line x1="86.00" y1="122.45" x2="83.50" y2="118.12" stroke="#60616a" stroke-width="2"/>
+<line x1="125" y1="190" x2="147.00" y2="228.11" stroke="#1c1c20" stroke-width="6" stroke-linecap="round"/>
+<line x1="125" y1="190" x2="125.00" y2="126.00" stroke="#1c1c20" stroke-width="4" stroke-linecap="round"/>
+<circle cx="125" cy="190" r="5" fill="#bc6700"/>
+</g>
+<g transform="translate(338 173)">
+<rect width="250" height="334" rx="24" fill="#222328"/>
+<text x="125" y="42" text-anchor="middle" fill="#f5f5f7" font-size="21" font-weight="600">UTC</text>
+<text x="125" y="69" text-anchor="middle" fill="#ffb547" font-size="14">UTC</text>
+<circle cx="125" cy="190" r="89" fill="#f5f5f7"/>
+<line x1="125.00" y1="112.00" x2="125.00" y2="107.00" stroke="#60616a" stroke-width="2"/>
+<line x1="164.00" y1="122.45" x2="166.50" y2="118.12" stroke="#60616a" stroke-width="2"/>
+<line x1="192.55" y1="151.00" x2="196.88" y2="148.50" stroke="#60616a" stroke-width="2"/>
+<line x1="203.00" y1="190.00" x2="208.00" y2="190.00" stroke="#60616a" stroke-width="2"/>
+<line x1="192.55" y1="229.00" x2="196.88" y2="231.50" stroke="#60616a" stroke-width="2"/>
+<line x1="164.00" y1="257.55" x2="166.50" y2="261.88" stroke="#60616a" stroke-width="2"/>
+<line x1="125.00" y1="268.00" x2="125.00" y2="273.00" stroke="#60616a" stroke-width="2"/>
+<line x1="86.00" y1="257.55" x2="83.50" y2="261.88" stroke="#60616a" stroke-width="2"/>
+<line x1="57.45" y1="229.00" x2="53.12" y2="231.50" stroke="#60616a" stroke-width="2"/>
+<line x1="47.00" y1="190.00" x2="42.00" y2="190.00" stroke="#60616a" stroke-width="2"/>
+<line x1="57.45" y1="151.00" x2="53.12" y2="148.50" stroke="#60616a" stroke-width="2"/>
+<line x1="86.00" y1="122.45" x2="83.50" y2="118.12" stroke="#60616a" stroke-width="2"/>
+<line x1="125" y1="190" x2="125.00" y2="146.00" stroke="#1c1c20" stroke-width="6" stroke-linecap="round"/>
+<line x1="125" y1="190" x2="125.00" y2="126.00" stroke="#1c1c20" stroke-width="4" stroke-linecap="round"/>
+<circle cx="125" cy="190" r="5" fill="#bc6700"/>
+</g>
+<g transform="translate(612 173)">
+<rect width="250" height="334" rx="24" fill="#283a30"/>
+<text x="125" y="42" text-anchor="middle" fill="#f5f5f7" font-size="21" font-weight="600">Kolkata</text>
+<text x="125" y="69" text-anchor="middle" fill="#a5d6ac" font-size="14">IST</text>
+<circle cx="125" cy="190" r="89" fill="#f5f5f7"/>
+<line x1="125.00" y1="112.00" x2="125.00" y2="107.00" stroke="#60616a" stroke-width="2"/>
+<line x1="164.00" y1="122.45" x2="166.50" y2="118.12" stroke="#60616a" stroke-width="2"/>
+<line x1="192.55" y1="151.00" x2="196.88" y2="148.50" stroke="#60616a" stroke-width="2"/>
+<line x1="203.00" y1="190.00" x2="208.00" y2="190.00" stroke="#60616a" stroke-width="2"/>
+<line x1="192.55" y1="229.00" x2="196.88" y2="231.50" stroke="#60616a" stroke-width="2"/>
+<line x1="164.00" y1="257.55" x2="166.50" y2="261.88" stroke="#60616a" stroke-width="2"/>
+<line x1="125.00" y1="268.00" x2="125.00" y2="273.00" stroke="#60616a" stroke-width="2"/>
+<line x1="86.00" y1="257.55" x2="83.50" y2="261.88" stroke="#60616a" stroke-width="2"/>
+<line x1="57.45" y1="229.00" x2="53.12" y2="231.50" stroke="#60616a" stroke-width="2"/>
+<line x1="47.00" y1="190.00" x2="42.00" y2="190.00" stroke="#60616a" stroke-width="2"/>
+<line x1="57.45" y1="151.00" x2="53.12" y2="148.50" stroke="#60616a" stroke-width="2"/>
+<line x1="86.00" y1="122.45" x2="83.50" y2="118.12" stroke="#60616a" stroke-width="2"/>
+<line x1="125" y1="190" x2="136.39" y2="232.50" stroke="#1c1c20" stroke-width="6" stroke-linecap="round"/>
+<line x1="125" y1="190" x2="125.00" y2="254.00" stroke="#1c1c20" stroke-width="4" stroke-linecap="round"/>
+<circle cx="125" cy="190" r="5" fill="#bc6700"/>
+</g>
+<g transform="translate(886 173)">
+<rect width="250" height="334" rx="24" fill="#352e49"/>
+<text x="125" y="42" text-anchor="middle" fill="#f5f5f7" font-size="21" font-weight="600">Shanghai</text>
+<text x="125" y="69" text-anchor="middle" fill="#c4b5fd" font-size="14">CST</text>
+<circle cx="125" cy="190" r="89" fill="#f5f5f7"/>
+<line x1="125.00" y1="112.00" x2="125.00" y2="107.00" stroke="#60616a" stroke-width="2"/>
+<line x1="164.00" y1="122.45" x2="166.50" y2="118.12" stroke="#60616a" stroke-width="2"/>
+<line x1="192.55" y1="151.00" x2="196.88" y2="148.50" stroke="#60616a" stroke-width="2"/>
+<line x1="203.00" y1="190.00" x2="208.00" y2="190.00" stroke="#60616a" stroke-width="2"/>
+<line x1="192.55" y1="229.00" x2="196.88" y2="231.50" stroke="#60616a" stroke-width="2"/>
+<line x1="164.00" y1="257.55" x2="166.50" y2="261.88" stroke="#60616a" stroke-width="2"/>
+<line x1="125.00" y1="268.00" x2="125.00" y2="273.00" stroke="#60616a" stroke-width="2"/>
+<line x1="86.00" y1="257.55" x2="83.50" y2="261.88" stroke="#60616a" stroke-width="2"/>
+<line x1="57.45" y1="229.00" x2="53.12" y2="231.50" stroke="#60616a" stroke-width="2"/>
+<line x1="47.00" y1="190.00" x2="42.00" y2="190.00" stroke="#60616a" stroke-width="2"/>
+<line x1="57.45" y1="151.00" x2="53.12" y2="148.50" stroke="#60616a" stroke-width="2"/>
+<line x1="86.00" y1="122.45" x2="83.50" y2="118.12" stroke="#60616a" stroke-width="2"/>
+<line x1="125" y1="190" x2="86.89" y2="212.00" stroke="#1c1c20" stroke-width="6" stroke-linecap="round"/>
+<line x1="125" y1="190" x2="125.00" y2="126.00" stroke="#1c1c20" stroke-width="4" stroke-linecap="round"/>
+<circle cx="125" cy="190" r="5" fill="#bc6700"/>
+</g>
+<text x="600" y="570" text-anchor="middle" fill="#b5b7c4" font-size="22">World clocks · Your colors · Time Travel</text>
+</g></svg>

@@ -121,6 +121,14 @@ Upload the contents of `dist/` to any HTTP(S) static host. The build validates c
 
 The build includes Brotli/gzip variants, cache-header rules, and an offline service worker. The versioned search catalog is loaded only when Add Clock opens and is cached after first use (2.05 MiB explicit gzip download). Production dashboards also save their smaller lookup catalog for offline links. App files are installed for offline reload, with safe updates and scoped cache cleanup. Run `PORT=4174 npm run preview` to verify the built site locally. GitHub Pages needs no custom headers or compression settings: publish the complete `dist/` directory. The app explicitly fetches `.json.gz` catalogs, decompresses them in the browser, and falls back to ordinary JSON when needed. Server-negotiated compression for other assets and custom cache headers remain optional optimizations. See [OFFLINE.md](OFFLINE.md) for deployment, offline limits, update behavior, and tests.
 
+For the planned `timedashboard.app` custom domain, use the [Cloudflare DNS import file and setup instructions](dns/README.md). Importing DNS and configuring the Pages custom domain are separate from publishing the build.
+
+## Link previews
+
+The HTML includes OpenGraph and Twitter large-image metadata with a 1200 × 630 PNG preview, title, description, and canonical URL. These tags are present before JavaScript runs. Pages builds take their absolute URLs from the configured Pages `base_url`; after changing the custom domain, rerun the deployment workflow to update the tags. Local builds default to the GitHub Pages URL; override it with `SITE_URL=https://timedashboard.app/ npm run build`.
+
+The preview is intentionally generic: URL fragments containing personal clock settings never reach a social crawler. Edit `assets/social-preview.svg`, then run `npm ci`, `npx playwright install chromium`, and `npm run social:preview` to regenerate the checked-in `social-preview.png`. Regular builds copy the PNG without requiring a browser.
+
 ## Refresh city data
 
 Download and extract `cities15000.zip` and download `admin1CodesASCII.txt` from the [GeoNames exports](https://download.geonames.org/export/dump/). Then run:

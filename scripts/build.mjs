@@ -27,8 +27,14 @@ for (const file of catalogs) await readFile(file);
 const output = resolve('dist');
 await rm(output, { recursive: true, force: true });
 await mkdir(resolve(output, 'data'), { recursive: true });
-for (const file of ['LICENSE', 'index.html', 'styles.css', 'favicon.svg', 'src', 'data/ATTRIBUTION.md', ...catalogs]) await cp(file, resolve(output, file), { recursive: true });
-const index = (await readFile('index.html', 'utf8')).replace('</head>', '  <meta name="offline-enabled" content="true">\n</head>');
+for (const file of ['LICENSE', 'index.html', 'styles.css', 'favicon.svg', 'social-preview.png', 'src', 'data/ATTRIBUTION.md', ...catalogs]) await cp(file, resolve(output, file), { recursive: true });
+const defaultSiteURL = 'https://shaztechio.github.io/time-dashboard/';
+const siteURL = new URL(process.env.SITE_URL || defaultSiteURL);
+if (!['https:', 'http:'].includes(siteURL.protocol) || siteURL.username || siteURL.password) throw new Error('SITE_URL must be an HTTP(S) URL without credentials');
+siteURL.search = ''; siteURL.hash = '';
+if (!siteURL.pathname.endsWith('/')) siteURL.pathname += '/';
+const escapedSiteURL = siteURL.href.replaceAll('&', '&amp;').replaceAll('"', '&quot;');
+const index = (await readFile('index.html', 'utf8')).replaceAll(defaultSiteURL, escapedSiteURL).replace('</head>', '  <meta name="offline-enabled" content="true">\n</head>');
 await writeFile(resolve(output, 'index.html'), index);
 async function filesAt(dir, prefix = '') {
   const files = [];

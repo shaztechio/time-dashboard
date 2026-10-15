@@ -20,7 +20,7 @@ import { resolve, extname, sep } from 'node:path';
 
 const root = resolve(process.env.SERVE_DIR || '.');
 const production = !!process.env.SERVE_DIR;
-const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml' };
+const types = { '.png': 'image/png', '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml' };
 function encodings(header = '') {
   const entries = new Map(header.split(',').map(entry => {
     const [name, ...options] = entry.trim().toLowerCase().split(';');

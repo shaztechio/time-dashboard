@@ -70,6 +70,10 @@ Copy link uses the same encoder. Copy times creates a single-instant text snapsh
 
 Support 320 px phones, tablets, and desktop layouts with no horizontal overflow. Provide labeled controls, semantic lists, accessible city search, keyboard ordering, visible keyboard focus, and non-disruptive action/error announcements. Do not announce every time tick as a live region. Unmounted slots are keyboard reachable and materialize their cards when focused. Keep focused cards mounted until focus leaves.
 
+## Social sharing metadata
+
+Include static OpenGraph and Twitter large-image tags, a canonical URL, and a 1200 × 630 PNG preview. Generate absolute URLs from the deployment base URL at build time, preserving repository subpaths and supporting custom domains. The preview describes the app, not fragment-encoded personal clock configurations. Keep the editable SVG source and reproducible PNG-generation command in the repository.
+
 ## Validation and delivery
 
 `.github/workflows/ci.yml` runs unit/build checks and six independent Chromium suites for pull requests or manual dispatch. Tooling uses Node.js 22 and locked Playwright dependencies via `npm ci`. Preserve screenshots and logs for seven days and keep PR permissions read-only, without Pages deployment access. New commits cancel superseded PR check runs.
