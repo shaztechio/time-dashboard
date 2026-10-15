@@ -26,10 +26,10 @@ export const PRESET_CITIES = {
 };
 export const cityIdentity = (clock) => PRESET_CITIES[clock.id] ?? clock.id;
 export const defaults = () => [
-  { id: 'geonames:5368361', label: 'Los Angeles', place: 'United States', zone: 'America/Los_Angeles', display: 'analog', hours: 24 },
+  { id: 'geonames:5391959', label: 'San Francisco', place: 'United States', zone: 'America/Los_Angeles', display: 'analog', hours: 24 },
   { id: 'utc', label: 'UTC', place: '', zone: 'UTC', display: 'analog', hours: 24 },
-  { id: 'geonames:1275004', label: 'Kolkata', place: 'India', zone: 'Asia/Kolkata', display: 'analog', hours: 24 },
-  { id: 'geonames:1796236', label: 'Shanghai', place: 'China', zone: 'Asia/Shanghai', display: 'analog', hours: 24 },
+  { id: 'geonames:1275339', label: 'Mumbai', place: 'India', zone: 'Asia/Kolkata', display: 'analog', hours: 24 },
+  { id: 'geonames:1816670', label: 'Beijing', place: 'China', zone: 'Asia/Shanghai', display: 'analog', hours: 24 },
 ];
 export function clockTitle(clock) {
   if (clock.id === 'utc') return 'UTC';

@@ -12,6 +12,7 @@
     "catalog": "node scripts/build-catalog.mjs",
     "build": "node scripts/build.mjs",
     "test:travel": "node tests/travel-browser.mjs",
+    "test:mobile": "node tests/mobile-menu-browser.mjs",
     "test:mini": "node tests/mini-browser.mjs",
     "preview": "SERVE_DIR=dist node scripts/serve.mjs",
     "test:offline": "node tests/offline-browser.mjs",

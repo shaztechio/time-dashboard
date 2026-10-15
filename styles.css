@@ -69,6 +69,22 @@ h1 { margin: 0; font-size: 40px; line-height: 1.1; letter-spacing: -1.5px; font-
 .header-meta { display: flex; justify-content: center; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; margin-top: 14px; }
 #clock-count { font-variant-numeric: tabular-nums; }
 .toolbar-actions { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; }
+#menu-toggle { display: none; }
+#menu-toggle svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+#mobile-menu { width: min(400px, calc(100vw - 24px)); height: fit-content; max-height: calc(100dvh - 24px); margin: 12px 12px 12px auto; padding: 20px; border: 1px solid var(--line); border-radius: 24px; }
+#mobile-menu .dialog-heading { padding: 0 40px 0 0; justify-content: flex-start; margin-bottom: 20px; }
+#mobile-menu h2 { font-size: 22px; }
+.menu-section + .menu-section { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 16px; }
+.menu-section h3 { margin: 0 0 10px; color: var(--muted); font-size: 12px; font-weight: 500; text-align: left; }
+#mobile-menu .toolbar-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+#mobile-menu .button { padding-inline: 10px; }
+#mobile-menu .secondary { background: var(--raised); }
+#mobile-menu .view-controls, #mobile-menu .theme-controls { width: 100%; margin: 0; }
+#mobile-menu .segments button { flex: 1; min-height: 44px; padding-inline: 6px; font-size: 12px; }
+#mobile-menu .sort-controls { display: grid; justify-content: stretch; gap: 4px; margin: 0; }
+#mobile-menu .sort-controls button { background: var(--raised); border-radius: 12px; }
+#mobile-menu .text-button { min-height: 44px; font-size: 13px; }
+body:not(.time-frozen) #menu-travel { display: none; }
 .button { min-height: 44px; border-radius: 22px; padding: 11px 18px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 500; }
 .button svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
 .primary { background: var(--accent-fill); color: #000; }
@@ -202,9 +218,11 @@ label[for="city-search"] { display: block; color: var(--muted); font-size: 12px;
 }
 @media (max-width: 640px) {
   .page { padding: 0 20px; }
-  .site-header { padding: 36px 0 28px; align-items: center; flex-direction: column; gap: 22px; }
-  h1 { font-size: 34px; letter-spacing: -1px; }
-  .header-meta { font-size: 11px; gap: 8px; margin-top: 11px; }
+  .site-header { position: relative; padding: 24px 52px 24px 0; align-items: flex-start; gap: 0; text-align: left; }
+  h1 { font-size: clamp(23px, 5.7vw, 30px); letter-spacing: -1px; }
+  .header-meta { justify-content: flex-start; flex-wrap: wrap; font-size: 10px; gap: 6px; margin-top: 9px; }
+  #menu-toggle { display: inline-flex; position: absolute; right: 0; top: 20px; background: var(--surface); }
+  #empty-add { display: none; }
   .toolbar-actions { width: 100%; justify-content: center; }
   .button { font-size: 13px; }
   .clock-grid { gap: 12px; }

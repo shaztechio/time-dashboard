@@ -24,6 +24,7 @@ import { clocksText } from './clipboard.js';
 import { pointerMotion, samplePointer, velocityAt, tiltTargets, spring } from './drag-physics.js';
 import { readTravelTime, travelURL } from './travel-time.js';
 import { setupTimeTravel } from './travel-ui.js';
+import { setupMobileMenu } from './mobile-menu.js';
 
 const $ = (selector) => document.querySelector(selector);
 const grid = $('#clocks');
@@ -646,4 +647,5 @@ setupTimeTravel({ getInstant: currentInstant, getClocks: () => clocks, setInstan
     return true;
   } catch (error) { announce(error.message); return false; }
 } });
+setupMobileMenu();
 loadLocation();

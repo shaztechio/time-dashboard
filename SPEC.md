@@ -6,7 +6,7 @@ Updated: 2026-10-15. GitHub Pages deployment is managed by `.github/workflows/pa
 
 A mobile-friendly static world-clock dashboard. All state and behavior run in the browser; hosting serves static HTML, CSS, JavaScript, and city catalogs. No account, application server, runtime city API, or database is required.
 
-- Four default clocks: Los Angeles, UTC, Kolkata, Shanghai, in that order.
+- Four default clocks: San Francisco, UTC, Mumbai, Beijing, in that order.
 - New clocks default to analog and 24-hour formatting and append to the current order.
 - User-defined order is persistent. Earliest to latest and Latest to earliest explicitly sort by current UTC offset; ticks and daylight saving changes never reorder clocks automatically.
 - Support 1,000 clocks with a soft cap: show a warning at 1,000 and in Add Clock when an addition reaches that threshold. Allow additions above it and preserve all records.
@@ -18,7 +18,7 @@ Use an iOS World Clock-inspired interface, large clocks, centered text, rounded 
 
 Analog clocks maximize the dial and have no visible digital readout; retain a readable time description for assistive technology. Dials are light from 06:00 through 17:59 local time and dark otherwise, independently of page theme. This is a day/night convention, not a sunrise calculation. Digital clocks show seconds and the configured 12/24-hour format.
 
-The page offers Copy times, Copy link, Add clock, explicit time sorting, and Restore defaults. Restore defaults replaces the list, order, display/hour settings, and designs with the four default clocks while retaining page appearance, card size, and any frozen instant. Dark / Light / System is centered at the bottom of the page. System is the default and follows device appearance changes. Save the page appearance preference locally (clock configuration lives in the URL; offline app/catalog caches are separate); unavailable browser storage must not prevent use.
+The page offers Copy times, Copy link, Add clock, explicit time sorting, and Restore defaults. Restore defaults replaces the list, order, display/hour settings, and designs with the four default clocks while retaining page appearance, card size, and any frozen instant. At widths up to 640px, a hamburger menu contains dashboard actions, card size, sorting, Restore defaults, Time Travel actions when frozen, and Dark / Light / System. The compact mobile header puts the clocks first. On larger screens, Dark / Light / System is centered at the bottom of the page. System is the default and follows device appearance changes. Save the page appearance preference locally (clock configuration lives in the URL; offline app/catalog caches are separate); unavailable browser storage must not prevent use.
 
 Tap anywhere on the front of a card to flip to its settings. The back contains the city name, a pill-shaped Done button with a subtle hover highlight, analog/digital and 12/24-hour controls, Move earlier/later, and Remove. Do not show a redundant Clock settings heading. Done, Escape, or tapping the settings background returns to the front. The palette button opens the design panel described below; other controls and drag handles do not trigger the general settings flip. Hidden faces are inert and excluded from the accessibility tree.
 

@@ -31,12 +31,12 @@ limitations under the License.
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Time Dashboard: four world clocks for Los Angeles, UTC, Kolkata, and Shanghai.">
+  <meta property="og:image:alt" content="Time Dashboard: four world clocks for San Francisco, UTC, Mumbai, and Beijing.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Time Dashboard">
   <meta name="twitter:description" content="Your world, at a glance. Customize and share world clocks, compare time zones, and explore any moment with Time Travel.">
   <meta name="twitter:image" content="https://shaztechio.github.io/time-dashboard/social-preview.png">
-  <meta name="twitter:image:alt" content="Time Dashboard: four world clocks for Los Angeles, UTC, Kolkata, and Shanghai.">
+  <meta name="twitter:image:alt" content="Time Dashboard: four world clocks for San Francisco, UTC, Mumbai, and Beijing.">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <script src="./src/theme.js"></script>
   <link rel="stylesheet" href="./styles.css">
@@ -46,6 +46,7 @@ limitations under the License.
   <button class="skip-link" type="button">Skip to clocks</button>
   <div class="page">
     <header class="site-header">
+      <button id="menu-toggle" class="icon-button" type="button" aria-label="Open dashboard menu" aria-haspopup="dialog" aria-controls="mobile-menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
       <div class="heading"><h1>Time Dashboard</h1><div class="header-meta"><span id="clock-count">4 clocks</span><span aria-hidden="true">·</span><time id="utc-today"></time><span>UTC</span></div></div>
       <div class="toolbar-actions"><button id="time-travel" class="button secondary" aria-pressed="false" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2M3 3v5h5"/></svg>Time Travel</button><button id="copy-times" class="button secondary"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V3H3v13h5"/></svg><span>Copy times</span></button><button id="copy-link" class="button secondary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5H5v15h14V5h-3M12 15V2m-4 4 4-4 4 4"/></svg><span>Copy link</span></button><button id="add-clock" class="button primary"><span aria-hidden="true">＋</span> Add clock</button></div>
     </header>
@@ -72,6 +73,15 @@ limitations under the License.
     </footer>
   </div>
 
+  <dialog id="mobile-menu" aria-labelledby="menu-title">
+    <div class="dialog-heading"><h2 id="menu-title">Dashboard menu</h2><button id="close-menu" type="button" class="icon-button" aria-label="Close dashboard menu" autofocus>×</button></div>
+    <div id="menu-actions" class="menu-section" role="group" aria-label="Dashboard actions"></div>
+    <div id="menu-travel" class="menu-section" role="group" aria-label="Frozen time controls"><h3>Time is frozen</h3></div>
+    <div id="menu-view" class="menu-section"><h3>Card size</h3></div>
+    <div id="menu-sort" class="menu-section"><h3>Sort clocks</h3></div>
+    <div id="menu-theme" class="menu-section"><h3>Appearance</h3></div>
+    <div id="menu-restore" class="menu-section"></div>
+  </dialog>
   <dialog id="city-dialog" aria-labelledby="dialog-title">
     <form id="city-form">
       <div class="dialog-heading"><div><h2 id="dialog-title">Add a clock</h2></div><button type="button" id="close-dialog" class="icon-button" aria-label="Close city search">×</button></div>

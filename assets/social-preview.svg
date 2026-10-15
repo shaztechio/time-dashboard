@@ -22,7 +22,7 @@ limitations under the License.
 <text x="1136" y="82" fill="#c7c9d3" text-anchor="end" font-size="20">shaztech.io</text>
 <g transform="translate(64 173)">
 <rect width="250" height="334" rx="24" fill="#1b303d"/>
-<text x="125" y="42" text-anchor="middle" fill="#f5f5f7" font-size="21" font-weight="600">Los Angeles</text>
+<text x="125" y="42" text-anchor="middle" fill="#f5f5f7" font-size="21" font-weight="600">San Francisco</text>
 <text x="125" y="69" text-anchor="middle" fill="#7dd3fc" font-size="14">PDT</text>
 <circle cx="125" cy="190" r="89" fill="#f5f5f7"/>
 <line x1="125.00" y1="112.00" x2="125.00" y2="107.00" stroke="#60616a" stroke-width="2"/>
@@ -64,7 +64,7 @@ limitations under the License.
 </g>
 <g transform="translate(612 173)">
 <rect width="250" height="334" rx="24" fill="#283a30"/>
-<text x="125" y="42" text-anchor="middle" fill="#f5f5f7" font-size="21" font-weight="600">Kolkata</text>
+<text x="125" y="42" text-anchor="middle" fill="#f5f5f7" font-size="21" font-weight="600">Mumbai</text>
 <text x="125" y="69" text-anchor="middle" fill="#a5d6ac" font-size="14">IST</text>
 <circle cx="125" cy="190" r="89" fill="#f5f5f7"/>
 <line x1="125.00" y1="112.00" x2="125.00" y2="107.00" stroke="#60616a" stroke-width="2"/>
@@ -85,7 +85,7 @@ limitations under the License.
 </g>
 <g transform="translate(886 173)">
 <rect width="250" height="334" rx="24" fill="#352e49"/>
-<text x="125" y="42" text-anchor="middle" fill="#f5f5f7" font-size="21" font-weight="600">Shanghai</text>
+<text x="125" y="42" text-anchor="middle" fill="#f5f5f7" font-size="21" font-weight="600">Beijing</text>
 <text x="125" y="69" text-anchor="middle" fill="#c4b5fd" font-size="14">CST</text>
 <circle cx="125" cy="190" r="89" fill="#f5f5f7"/>
 <line x1="125.00" y1="112.00" x2="125.00" y2="107.00" stroke="#60616a" stroke-width="2"/>

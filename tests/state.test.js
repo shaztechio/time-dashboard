@@ -39,7 +39,7 @@ test('compact records preserve order and all format combinations and resolve cat
   assert.deepEqual(readState(url, catalog).clocks, clocks);
   assert.equal(stateURL(url, readState(url, catalog).clocks), url);
   assert.notEqual(stateURL(base, [...clocks].reverse()), url);
-  assert.equal(clockTitle(defaults()[0]), 'Los Angeles, United States');
+  assert.equal(clockTitle(defaults()[0]), 'San Francisco, United States');
   const sao = { ...catalog.get(3448439), display: 'analog', hours: 24 };
   assert.equal(readState(stateURL(base, [sao]), catalog).clocks[0].label, 'São Paulo');
 });

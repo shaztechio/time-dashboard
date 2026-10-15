@@ -16,12 +16,13 @@ Open [the local dashboard](http://127.0.0.1:4173). Use `PORT=8080 npm run dev` t
 
 ## Features
 
-- Los Angeles, UTC, Kolkata, and Shanghai by default, in that initial order. New clocks are appended to your custom order.
+- San Francisco, UTC, Mumbai, and Beijing by default, in that initial order. New clocks are appended to your custom order.
 - iOS-inspired cards with a single city/country title and time-zone abbreviation. Tap anywhere on a card to flip to settings; tap the settings background, **Done**, or Escape to return. The palette button opens a separate design panel; other controls and drag handles do not trigger the general settings flip.
-- Choose **Dark**, **Light**, or **System** at the bottom of the page. System follows device appearance changes and is the default; the choice is saved on this device when browser storage is available. Clock dial day/night colors still follow each city's local hour. Card backs show the city and a pill-shaped Done button without a redundant settings heading.
+- Choose **Dark**, **Light**, or **System** in the mobile menu or at the bottom of the desktop page. System follows device appearance changes and is the default; the choice is saved on this device when browser storage is available. Clock dial day/night colors still follow each city's local hour. Card backs show the city and a pill-shaped Done button without a redundant settings heading.
 - Search 34,162 cities using names, regional qualifiers, transliterations, and selected aliases; UTC is also searchable.
 - **Use my timezone** in Add Clock suggests a city matching the device's timezone, without location permission or external lookups. Confirm with Add clock, or choose another matching city. It detects existing cities and leaves search available when there is no match.
 - Add/remove clocks, switch each clock’s display and hour format, restore defaults, and copy a shareable link.
+- On mobile (up to 640px), the hamburger menu holds dashboard actions, card size, sorting, and Dark / Light / System controls, leaving more room for the clocks.
 - **Copy times** copies one line per city in the displayed order, with its current time, zone abbreviation, UTC offset, and local date. It respects each clock's 12/24-hour setting and provides selectable text if clipboard access is unavailable.
 - Keyboard-accessible city picker, responsive cards, and centered text. Analog is the default, with a large dial and no visible digital readout (readable time remains available to screen readers).
 - Drag a card’s grip to reorder with mouse or touch, use arrow keys on the grip, or use Move earlier/later in settings. The **Earliest to latest** and **Latest to earliest** buttons sort once; clocks never auto-reorder.
@@ -32,7 +33,7 @@ Open [the local dashboard](http://127.0.0.1:4173). Use `PORT=8080 npm run dev` t
 
 ## Card size
 
-Choose **Standard cards** or **Mini cards** above the clocks. Mini cards show a denser grid, including two columns on phones, while retaining analog/digital displays, flip settings, dragging, and Time Travel. City names reserve the same two-line space and are vertically centered, keeping clock faces aligned even when names wrap. Settings on mini-card backs scroll when needed. Mini cards are the default. The `view=standard` query parameter saves the larger layout in copied links and browser history; omitting it uses mini cards. Existing `view=mini` links still work. Run `npm run test:mini` for browser checks.
+Choose **Standard cards** or **Mini cards** above the clocks on desktop, or in the hamburger menu on mobile. Mini cards show a denser grid, including two columns on phones, while retaining analog/digital displays, flip settings, dragging, and Time Travel. City names reserve the same two-line space and are vertically centered, keeping clock faces aligned even when names wrap. Settings on mini-card backs scroll when needed. Mini cards are the default. The `view=standard` query parameter saves the larger layout in copied links and browser history; omitting it uses mini cards. Existing `view=mini` links still work. Run `npm run test:mini` for browser checks.
 
 ## Card designs
 
@@ -91,11 +92,12 @@ npm run test:browser
 npm run test:scale
 npm run test:travel
 npm run test:mini
+npm run test:mobile
 npm run test:design
 npm run test:offline
 ```
 
-Alternatively, set `PLAYWRIGHT_MODULE` to an absolute path to an existing Playwright ESM entry point. `TEST_URL` overrides the local URL for interaction, scale, travel, mini, and design suites. The interaction suite also requests its `dist/` subdirectory, so point it at the source development server after building. The offline suite creates its own temporary production server from `dist/` and does not use `TEST_URL`. Screenshots are saved under ignored `test-results/`.
+Alternatively, set `PLAYWRIGHT_MODULE` to an absolute path to an existing Playwright ESM entry point. `TEST_URL` overrides the local URL for interaction, scale, travel, mini, mobile, and design suites. The interaction suite also requests its `dist/` subdirectory, so point it at the source development server after building. The offline suite creates its own temporary production server from `dist/` and does not use `TEST_URL`. Screenshots are saved under ignored `test-results/`.
 
 The scale suite opens real 1,000-clock links, verifies bounded rendering and ticking, scrolls and drags through newly mounted rows, and adds past the warning threshold.
 

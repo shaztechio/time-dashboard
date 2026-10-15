@@ -41,6 +41,7 @@ async function test(name, run) {
   console.log(`PASS ${name} (${Math.round(performance.now() - start)}ms)`);
 }
 async function search(query) {
+  if (await page.locator('#menu-toggle').isVisible()) await page.locator('#menu-toggle').click();
   await page.locator('#add-clock').click();
   await page.locator('#city-search').fill(query);
   await page.waitForFunction(() => !document.querySelector('#search-status').textContent.includes('Loading'));
@@ -49,7 +50,7 @@ try {
   await test('defaults, ticking, stable history, and desktop layout', async () => {
     await page.goto(base);
     await count(4);
-    assert.deepEqual(await cards.locator('h3').allTextContents(), ['Los Angeles, United States', 'UTC', 'Kolkata, India', 'Shanghai, China']);
+    assert.deepEqual(await cards.locator('h3').allTextContents(), ['San Francisco, United States', 'UTC', 'Mumbai, India', 'Beijing, China']);
     assert.equal(await cards.first().getAttribute('data-hours'), '24');
     assert.deepEqual(await cards.evaluateAll(els => els.map(el => el.dataset.display)), ['analog', 'analog', 'analog', 'analog']);
     assert.equal(await cards.first().locator('.time-display').evaluate(el => el.getBoundingClientRect().width <= 1), true);
@@ -198,7 +199,7 @@ try {
     await count(5);
     assert.equal(await page.locator('.clock-card[data-id="geonames:1850147"]').getAttribute('data-display'), 'analog');
     assert.equal(await page.evaluate(() => document.activeElement.dataset.id), 'geonames:1850147');
-    await search('Los Angeles');
+    await search('San Francisco');
     assert.equal(await page.locator('.city-option').first().getAttribute('aria-disabled'), 'true');
     await page.locator('#city-search').fill('Bombay');
     assert.match(await page.locator('.city-option').first().textContent(), /Mumbai/);
@@ -262,7 +263,7 @@ try {
     clocks[0].place = '<img src=x onerror=alert(1)>';
     await page.goto(stateURL(base, clocks));
     await count(4);
-    assert.equal(await cards.first().locator('h3').textContent(), 'Los Angeles, United States'); // URL labels are resolved from the trusted catalog.
+    assert.equal(await cards.first().locator('h3').textContent(), 'San Francisco, United States'); // URL labels are resolved from the trusted catalog.
     assert.equal(await cards.locator('img').count(), 0);
     await page.evaluate(() => { Object.defineProperty(navigator, 'clipboard', { value: { writeText: () => Promise.reject(new Error('Unavailable')) }, configurable: true }); });
     await page.locator('#copy-link').click();
@@ -330,8 +331,8 @@ try {
         await local.waitForFunction(() => !document.querySelector('#use-timezone').disabled);
         assert.match(await local.locator('#timezone-status').textContent(), /already added/);
       } else if (city) {
-        assert.match(await local.locator('#timezone-status').textContent(), /Los Angeles is already added/);
-        assert.equal(await local.locator('#confirm-add').isDisabled(), true);
+        assert.match(await local.locator('#selection').textContent(), /Selected: Los Angeles/);
+        assert.equal(await local.locator('#confirm-add').isEnabled(), true);
       } else {
         assert.match(await local.locator('#timezone-status').textContent(), /No matching city/);
         assert.equal(await local.locator('#confirm-add').isDisabled(), true);
@@ -400,7 +401,7 @@ try {
     old[3].label = 'China Time';
     await page.goto(stateURL(new URL('dist/', base).href, old));
     await count(4);
-    assert.deepEqual(await cards.locator('h3').allTextContents(), ['Los Angeles, United States', 'UTC', 'Kolkata, India', 'Shanghai, China']);
+    assert.deepEqual(await cards.locator('h3').allTextContents(), ['San Francisco, United States', 'UTC', 'Mumbai, India', 'Beijing, China']);
     assert.match(await cards.first().locator('.zone-code').textContent(), /^P[SD]T$/);
     assert.equal(await cards.nth(2).locator('.zone-code').textContent(), 'IST');
     assert.equal(await cards.nth(3).locator('.zone-code').textContent(), 'CST');

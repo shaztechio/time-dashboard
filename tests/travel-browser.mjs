@@ -45,9 +45,9 @@ try {
   await page.locator('#travel-occurrence').selectOption('1');
   await page.locator('#travel-apply').click();
   assert.equal(new URL(page.url()).searchParams.get('at'),'2026-11-01T09:30:00Z');
-  assert.equal(await page.locator('[data-id="geonames:5368361"] .zone-code').textContent(),'PST');
+  assert.equal(await page.locator('[data-id="geonames:5391959"] .zone-code').textContent(),'PST');
   assert.equal(await page.locator('[data-id="utc"] .time-main').textContent(),'09:30');
-  assert.equal(await page.locator('[data-id="geonames:1275004"] .time-main').textContent(),'15:00');
+  assert.equal(await page.locator('[data-id="geonames:1275339"] .time-main').textContent(),'15:00');
   await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{value:{writeText:async text=>window.copied=text},configurable:true}));
   await page.locator('#copy-times').click();
   assert.match(await page.evaluate(()=>window.copied),/UTC — 09:30:00 UTC/);
@@ -77,6 +77,7 @@ try {
   await page.locator('#cancel-travel').click();
   assert.equal(new URL(page.url()).searchParams.get('at'),'2026-11-01T10:30:00Z');
   await page.setViewportSize({width:390,height:844});
+  await page.locator('#menu-toggle').click();
   await page.locator('#adjust-time').click();
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   await page.screenshot({path:'test-results/time-travel-mobile.png'});
@@ -92,6 +93,7 @@ try {
   assert.equal(await page.locator('.clock-slot:last-child .time-display').textContent(),offscreen);
   await page.goto(`${base}?at=invalid`); await waitReady();
   assert.equal(await page.locator('#notice').isVisible(),true);
+  await page.locator('#menu-toggle').click();
   await page.locator('#restore').click();
   assert.equal(new URL(page.url()).searchParams.has('at'),false);
   assert.deepEqual(errors,[]);

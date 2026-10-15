@@ -39,8 +39,8 @@ test('search handles accents, aliases, regional context, and UTC', () => {
 test('preset duplicate detection still permits other cities in the same zone', () => {
   const la = searchCities(cities, 'Los Angeles').find((city) => city.id === 'geonames:5368361');
   const sf = searchCities(cities, 'San Francisco').find((city) => city.id === 'geonames:5391959');
-  assert.equal(alreadyAdded(la, defaults()), true);
-  assert.equal(alreadyAdded(sf, defaults()), false);
+  assert.equal(alreadyAdded(la, defaults()), false);
+  assert.equal(alreadyAdded(sf, defaults()), true);
   assert.equal(la.zone, sf.zone);
 });
 test('device timezone matches canonical aliases and prefers the named city', () => {
