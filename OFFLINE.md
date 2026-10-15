@@ -11,7 +11,8 @@ The build emits:
 - Immutable `data/cities-2026-10-14.json` search data and supported `data/clock-catalog-*.json` lookup snapshots.
 - Precompressed `.br` and `.gz` sidecars for JSON, JavaScript, CSS, HTML, and SVG assets.
 - The project `LICENSE`, vendored fflate MIT license, and GeoNames data attribution.
-- `sw.js` with a content-derived revision and SHA-256 hashes of the app files.
+- Build-fingerprinted HTML snapshots, JavaScript (including every module import), CSS, favicon, and social preview. The mutable `index.html` references only its own release’s asset URLs.
+- `sw.js` with a content-derived revision and SHA-256 hashes of that release’s app files.
 - `_headers` for hosts that support that format, and `build-manifest.json` with compression sizes and included assets.
 
 The current search data is 5,335,953 bytes raw, 2,145,547 bytes gzip, or 1,470,602 bytes Brotli. The lookup is 1,707,251 bytes raw, 486,766 bytes gzip, or 351,092 bytes Brotli. These are build measurements. The production app explicitly requests the gzip files, so catalog compression does not depend on server negotiation.
@@ -24,7 +25,7 @@ The following policies are emitted for the local production preview and hosts th
 
 | Resource | Cache-Control |
 | --- | --- |
-| Versioned catalog JSON and `.json.gz` files | `public, max-age=31536000, immutable` |
+| Fingerprinted app assets, versioned catalog JSON and `.json.gz` files | `public, max-age=31536000, immutable` |
 | HTML, service worker, unversioned JS/CSS | `no-cache` (with ETag validation) |
 
 Never modify an already published catalog filename. Generate a new dated snapshot and update the current catalog version in the app. Keep supported lookup snapshots available for older v2 links. Search generation uses exclusive creation to prevent accidental overwrite; lookup generation also rejects replacing existing content.
@@ -55,14 +56,26 @@ Browsers may evict site data, private browsing may restrict storage, and users c
 
 ## Updates and cache cleanup
 
-Installation fetches the complete app shell and verifies every file against its build hash. A partial or mixed deployment fails installation and leaves the previous working worker intact. The worker does not call skipWaiting: open tabs retain the version they started with. The footer announces an installed update and asks users to close all dashboard tabs and reopen. Reloading a still-controlled tab alone may not activate a waiting worker.
+Installation fetches the complete app shell, including its immutable `index.<revision>.html` snapshot, and verifies every file against its build hash. It does not hash the mutable homepage, which may already belong to another release or have been changed by a CDN. New pages register `sw.js?release=<revision>` with `updateViaCache: none` so their first worker request does not reuse the previous release’s CDN entry. Worker updates may still be delayed by a CDN; all shell files they reference remain pinned to one release. A partial or mixed deployment fails installation and leaves the previous working worker intact. The worker does not call skipWaiting: open tabs retain the version they started with. The footer announces an installed update and asks users to close all dashboard tabs and reopen. Reloading a still-controlled tab alone may not activate a waiting worker.
 
-Once the new worker activates, it deletes only this deployment's old app-shell caches and removes catalog cache entries not in the current supported list. Supported lookup versions and the current search snapshot survive app updates. Scope-specific cache names prevent cleanup from affecting another dashboard deployed on the same origin. Keep old assets available during deployment and upload atomically where possible.
+Once the new worker activates, it deletes only this deployment's old app-shell caches and removes catalog cache entries not in the current supported list. Supported lookup versions and the current search snapshot survive app updates. Scope-specific cache names prevent cleanup from affecting another dashboard deployed on the same origin.
+
+## Deployment consistency
+
+Fingerprinting is applied to the whole module graph, including side-effect imports, vendor modules, and cycles. A change to any shell input changes every shell asset URL. The page and its imports therefore cannot combine newly deployed files with cached files under old URLs, even on the first visit before a service worker is installed. An old homepage can still render an older release, but it renders that complete release.
+
+The Pages workflow downloads the last successful deployment’s `site-assets` artifact before building. `PREVIOUS_SITE_DIR` points the build at that archive. Every previously published shell asset is copied unchanged into the next site; only the mutable homepage and worker are replaced. The initial migration restores the previous `github-pages` artifact and preserves its unversioned assets for pre-migration cached pages. Root and subdirectory URLs keep the same relative catalog paths and worker scope. Only the current release is precached by the worker; retained server assets do not increase each client’s offline cache.
+
+The archive is uploaded with 90-day retention, renewed by each successful deployment. If the last successful deployment archive has expired or been deleted, deployment fails rather than silently dropping assets that cached pages may need. To recover, restore its published files and `build-manifest.json` into `PREVIOUS_SITE_DIR` (or restore the archive) before deploying. Do not prune retained filenames or change their bytes while cached pages can still reference them. Standalone local builds without `PREVIOUS_SITE_DIR` intentionally contain only the current release.
+
+GitHub Pages does not honor `_headers`, and a CDN may override HTTP caching policies. Correctness therefore relies on immutable filenames and retained assets, not on a cache purge or a `no-cache` header. This follows the [versioned-URL caching pattern described by MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching).
 
 To inspect or reset offline storage, use browser developer tools → Application → Service Workers / Cache Storage. Clearing site data removes offline files, not clock settings encoded in a saved URL.
 
 ## Verification
 
 Run `npm test` for gzip loader cases including unsupported decompression, corrupt/missing downloads, server-decoded responses, and JSON fallback. After building, run `npm run test:offline` with Playwright available (or set `PLAYWRIGHT_MODULE`). It starts an isolated production fixture and checks explicit gzip downloads without Content-Encoding, no duplicate raw catalog downloads, canonical decoded caching, Brotli/gzip negotiation, ETags/304, cache policy, lazy downloads, first-visit lookup caching, offline links/search/add/Time Travel, subdirectory scope, corrupt-cache recovery, failed installation, waiting upgrades, activation cleanup, and unavailable-storage fallback.
+
+Run `npm run test:deployment` after building to simulate two actual production builds, a CDN returning stale mutable assets, stale entry HTML, first visits without a worker, and an older worker installing against a newer homepage. It checks retained bytes, matching entry/dependency/CSS versions, mobile menu behavior, and offline consistency.
 
 Background: [MDN HTTP caching](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching), [MDN service-worker lifecycle](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers), and [Content-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Encoding).

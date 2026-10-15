@@ -50,7 +50,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [browser, scale, travel, mini, design, offline]
+        suite: [browser, scale, travel, mini, design, offline, deployment]
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v7.1.0
@@ -67,7 +67,7 @@ jobs:
           SUITE: ${{ matrix.suite }}
         run: |
           mkdir -p test-results
-          if [ "$SUITE" != offline ]; then
+          if [ "$SUITE" != offline ] && [ "$SUITE" != deployment ]; then
             npm run dev > test-results/server.log 2>&1 &
             server_pid=$!
             trap 'kill "$server_pid" 2>/dev/null || true' EXIT

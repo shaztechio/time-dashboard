@@ -21,6 +21,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: github-pages
@@ -39,10 +40,28 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Test
         run: npm test
+      - name: Restore published assets for cached pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PREVIOUS_SITE_DIR: ${{ runner.temp }}/previous-site
+        run: node scripts/restore-deployment.mjs
       - name: Build production site
         env:
           SITE_URL: ${{ steps.pages.outputs.base_url }}
+          PREVIOUS_SITE_DIR: ${{ runner.temp }}/previous-site
         run: npm run build
+      - name: Retain immutable assets for future deployments
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-assets
+          path: |
+            dist/
+            !dist/data/**
+            !dist/**/*.br
+            !dist/**/*.gz
+          retention-days: 90
+          if-no-files-found: error
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
         with:

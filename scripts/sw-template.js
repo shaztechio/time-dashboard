@@ -23,7 +23,7 @@ const shellName = prefix + REVISION;
 const catalogName = `world-clock-catalogs:${base.pathname}`;
 const assets = new Map(ASSETS.map(([path, hash]) => [new URL(path, base).href, hash]));
 const catalogs = new Set(CATALOGS.map(path => new URL(path, base).href));
-const index = new URL('index.html', base).href;
+const index = new URL('__INDEX__', base).href;
 self.addEventListener('install', event => event.waitUntil((async () => {
   const cache = await caches.open(shellName);
   try {
@@ -49,7 +49,7 @@ self.addEventListener('fetch', event => {
   const request = event.request;
   const url = new URL(request.url);
   if (request.method !== 'GET' || url.origin !== base.origin) return;
-  const navigation = request.mode === 'navigate' && (url.pathname === base.pathname || url.pathname === new URL(index).pathname);
+  const navigation = request.mode === 'navigate' && (url.pathname === base.pathname || url.pathname === new URL('index.html', base).pathname);
   if (navigation || assets.has(url.href)) {
     const key = navigation ? index : url.href;
     event.respondWith((async () => {

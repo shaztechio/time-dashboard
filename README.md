@@ -95,9 +95,10 @@ npm run test:mini
 npm run test:mobile
 npm run test:design
 npm run test:offline
+npm run test:deployment
 ```
 
-Alternatively, set `PLAYWRIGHT_MODULE` to an absolute path to an existing Playwright ESM entry point. `TEST_URL` overrides the local URL for interaction, scale, travel, mini, mobile, and design suites. The interaction suite also requests its `dist/` subdirectory, so point it at the source development server after building. The offline suite creates its own temporary production server from `dist/` and does not use `TEST_URL`. Screenshots are saved under ignored `test-results/`.
+Alternatively, set `PLAYWRIGHT_MODULE` to an absolute path to an existing Playwright ESM entry point. `TEST_URL` overrides the local URL for interaction, scale, travel, mini, mobile, and design suites. The interaction suite also requests its `dist/` subdirectory, so point it at the source development server after building. The offline and deployment suites create temporary production servers from `dist/` and do not use `TEST_URL`. Screenshots are saved under ignored `test-results/`.
 
 The scale suite opens real 1,000-clock links, verifies bounded rendering and ticking, scrolls and drags through newly mounted rows, and adds past the warning threshold.
 

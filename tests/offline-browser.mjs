@@ -57,10 +57,16 @@ try {
  const identity=await raw(search,{'Accept-Encoding':'identity'});assert.deepEqual(identity.body,original);
  const unchanged=await raw(search,{'Accept-Encoding':'br','If-None-Match':br.headers.etag});assert.equal(unchanged.status,304);assert.equal(unchanged.body.length,0);
  assert.equal((await raw('sw.js')).headers['cache-control'],'no-cache');
+ const published=JSON.parse(await readFile(join(root,'app/build-manifest.json')));
+ assert.equal((await raw(published.assets['styles.css'])).headers['cache-control'],'public, max-age=31536000, immutable');
  console.log(`PASS negotiated Brotli (${br.body.length} bytes), gzip, identity, immutable headers and ETag 304.`);
  const explicit=await raw(search+'.gz',{'Accept-Encoding':'br, gzip'});
  assert.equal(explicit.headers['content-encoding'],undefined);
  assert.deepEqual(gunzipSync(explicit.body),original);
+ const entryPath=join(root,'app/index.html');
+ const entry=await readFile(entryPath,'utf8');
+ await writeFile(entryPath,entry+'\n<!-- mutable CDN entry response -->');
+ for(const ext of ['.br','.gz']) await rm(entryPath+ext);
  await page.goto(base);await ready();
  assert.ok(responses.includes(base+lookup+'.gz'),'First lookup explicitly requests gzip');
  assert.ok(!responses.includes(base+lookup),'No raw lookup download on successful gzip');
@@ -103,7 +109,8 @@ try {
  const workerPath=join(root,'app/sw.js');
  const oldWorker=await readFile(workerPath,'utf8');
  for(const ext of ['.br','.gz']) await rm(workerPath+ext);
- const oldCSS=await readFile(join(root,'app/styles.css'),'utf8');
+ const cssPath=join(root,'app',manifest.assets['styles.css']);
+ const oldCSS=await readFile(cssPath,'utf8');
  const hash=value=>createHash('sha256').update(value).digest('hex');
  const newCSS=oldCSS+'\n/* offline update test */\n';
  // Failed/mixed release cannot replace the current working worker.
@@ -112,8 +119,8 @@ try {
  await page.waitForFunction(async()=>!(await navigator.serviceWorker.getRegistration()).installing);
  assert.equal(await page.evaluate(async()=>!!(await navigator.serviceWorker.getRegistration()).waiting),false);
  assert.ok(Object.keys(await cacheKeys()).some(name=>name.endsWith(manifest.revision)));
- await writeFile(join(root,'app/styles.css'),newCSS);
- for(const ext of ['.br','.gz']) await rm(join(root,'app/styles.css'+ext));
+ await writeFile(cssPath,newCSS);
+ for(const ext of ['.br','.gz']) await rm(cssPath+ext);
  await writeFile(workerPath,oldWorker.replace(manifest.revision,'working-update').replace(hash(oldCSS),hash(newCSS)));
  await page.evaluate(async()=>{await(await navigator.serviceWorker.getRegistration()).update();});
  await page.waitForFunction(async()=>!!(await navigator.serviceWorker.getRegistration()).waiting);
