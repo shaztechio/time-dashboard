@@ -105,6 +105,8 @@ The interaction suite checks desktop/mobile layout, keyboard selection, format c
 
 ## Static deployment
 
+The repository uses [GitHub Pages](https://shaztechio.github.io/time-dashboard/) with the [Deploy GitHub Pages workflow](.github/workflows/pages.yml). Every push to `main` runs the unit tests, builds the production site with Node.js 22, and publishes only `dist/`. You can also run the workflow manually from the repository's Actions tab. GitHub Pages must use **GitHub Actions** as its publishing source.
+
 ```sh
 npm run build
 ```
@@ -141,3 +143,9 @@ Compression uses locally vendored [fflate 0.8.3](https://github.com/101arrowz/ff
 - [URL-SCALE-ANALYSIS.md](URL-SCALE-ANALYSIS.md): historical v1 measurements and the decision to use compact fragments and virtualized rendering.
 
 When changing a feature, update its README instructions and specification, plus the URL or offline document when persistence or loading changes. Keep documented commands aligned with `package.json`; distinguish historical measurements from current guarantees.
+
+## License
+
+Original project source code and documentation are licensed under [Apache-2.0](LICENSE). Source files carry Apache-2.0 notices, `package.json` declares the license, and production builds include the root `LICENSE` file.
+
+Third-party material retains its own license: vendored fflate remains [MIT](src/vendor/fflate.LICENSE), and GeoNames-derived city catalogs remain [CC BY 4.0](data/ATTRIBUTION.md). Their existing notices and attribution are preserved.

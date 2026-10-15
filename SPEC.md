@@ -1,6 +1,6 @@
 # Time Dashboard — Implemented Specification
 
-Updated: 2026-10-15. Implemented locally; publishing is a separate action.
+Updated: 2026-10-15. GitHub Pages deployment is managed by `.github/workflows/pages.yml`, with tests and production builds on pushes to `main` or manual dispatch.
 
 ## Product
 
@@ -75,7 +75,7 @@ Support 320 px phones, tablets, and desktop layouts with no horizontal overflow.
 - Unit tests: URL packing/compression/validation, 1,000+ record round-trips, catalog integrity, search, duplicate handling, timezone suggestions, DST, fractional offsets, time text, drag motion, compact card designs, and explicit gzip/JSON fallback handling.
 - Browser tests: desktop/mobile layout, card settings, theme modes and storage failures, search and retries, copy fallbacks, custom order, pointer/keyboard dragging, cancellation, and history. Dedicated mini-card, design, and Time Travel suites cover their layouts, persistence, and controls; the offline suite covers gzip transfers, cache recovery, offline edits, and safe worker updates.
 - Scale tests: real 1,000-clock fragment navigation and reload, bounded mounted cards and time formatting, middle/end scrolling, drag auto-scroll across virtualized rows, full-state edits/order/copy/sort, fresh shared links, 1,001 clocks, soft-cap warning transitions, and mobile width.
-- Build: verify matching search/current lookup catalogs, retain supported immutable lookup versions and vendored license, then emit static assets, gzip/Brotli variants, a content-hashed service-worker manifest, optional host header rules, and size metadata into `dist/`.
+- Build: verify matching search/current lookup catalogs, retain supported immutable lookup versions, the project Apache-2.0 LICENSE, vendored MIT license, and GeoNames attribution, then emit static assets, gzip/Brotli variants, a content-hashed service-worker manifest, optional host header rules, and size metadata into `dist/`.
 
 The local browser checks do not replace testing the final deployed URL and real mobile/Safari/Firefox behavior. No deployment or external publication is implied by implementation.
 

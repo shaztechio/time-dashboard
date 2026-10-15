@@ -1,3 +1,18 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import { cp, mkdir, rm, readFile, writeFile, readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { createHash } from 'node:crypto';
@@ -12,7 +27,7 @@ for (const file of catalogs) await readFile(file);
 const output = resolve('dist');
 await rm(output, { recursive: true, force: true });
 await mkdir(resolve(output, 'data'), { recursive: true });
-for (const file of ['index.html', 'styles.css', 'favicon.svg', 'src', 'data/ATTRIBUTION.md', ...catalogs]) await cp(file, resolve(output, file), { recursive: true });
+for (const file of ['LICENSE', 'index.html', 'styles.css', 'favicon.svg', 'src', 'data/ATTRIBUTION.md', ...catalogs]) await cp(file, resolve(output, file), { recursive: true });
 const index = (await readFile('index.html', 'utf8')).replace('</head>', '  <meta name="offline-enabled" content="true">\n</head>');
 await writeFile(resolve(output, 'index.html'), index);
 async function filesAt(dir, prefix = '') {
