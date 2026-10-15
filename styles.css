@@ -218,9 +218,9 @@ label[for="city-search"] { display: block; color: var(--muted); font-size: 12px;
 }
 @media (max-width: 640px) {
   .page { padding: 0 20px; }
-  .site-header { position: relative; padding: 24px 52px 24px 0; align-items: flex-start; gap: 0; text-align: left; }
+  .site-header { position: relative; padding: 24px 48px; align-items: center; gap: 0; text-align: center; }
   h1 { font-size: clamp(23px, 5.7vw, 30px); letter-spacing: -1px; }
-  .header-meta { justify-content: flex-start; flex-wrap: wrap; font-size: 10px; gap: 6px; margin-top: 9px; }
+  .header-meta { justify-content: center; flex-wrap: wrap; font-size: 10px; gap: 6px; margin-top: 9px; }
   #menu-toggle { display: inline-flex; position: absolute; right: 0; top: 20px; background: var(--surface); }
   #empty-add { display: none; }
   .toolbar-actions { width: 100%; justify-content: center; }
