@@ -101,7 +101,7 @@ body:not(.time-frozen) #menu-travel { display: none; }
 [data-flipped="true"] .card-rotator { transform: rotateY(180deg); }
 .card-front, .card-back { grid-area: 1 / 1; position: relative; padding: 25px 24px 24px; border-radius: 24px; background: var(--surface); -webkit-backface-visibility: hidden; backface-visibility: hidden; min-width: 0; display: flex; flex-direction: column; overflow: auto; }
 .card-back { transform: rotateY(180deg); cursor: pointer; }
-.card-back .card-top { position: relative; padding: 0 38px; min-height: 30px; }
+.card-back .card-top { position: relative; padding: 4px; min-height: 52px; flex-shrink: 0; justify-content: flex-end; margin-bottom: 8px; }
 .card-top { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .city-title { font-size: 21px; font-weight: 550; letter-spacing: -.5px; line-height: 1.25; margin: 0; overflow-wrap: anywhere; }
 .icon-button { width: 44px; height: 44px; border-radius: 50%; background: transparent; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--orange); font-size: 25px; }
@@ -140,7 +140,7 @@ body:not(.time-frozen) #menu-travel { display: none; }
 [data-daylight="true"] .minor-tick { stroke: #a6a6a6; }
 [data-daylight="true"] .numerals text { fill: #111; }
 [data-daylight="true"] .hour-hand, [data-daylight="true"] .minute-hand { stroke: #111; }
-.flip-close { position: absolute; right: -8px; top: -8px; margin: 0; background: var(--raised); transition: background-color 150ms ease; }
+.flip-close { margin: 0; padding: 12px 20px; background: var(--raised); transition: background-color 150ms ease; }
 .flip-close:hover { background: #ff9f0a26; }
 .settings-city { color: var(--muted); font-size: 12px; line-height: 1.4; margin: 5px 0 22px; overflow-wrap: anywhere; }
 .setting { margin-bottom: 19px; }
@@ -323,7 +323,6 @@ body[data-card-view="mini"] .time-main { font-size: clamp(30px, 21cqw, 48px); le
 body[data-card-view="mini"] .time-seconds { font-size: 13px; letter-spacing: 0; }
 body[data-card-view="mini"] .time-period { font-size: 10px; bottom: -16px; }
 body[data-card-view="mini"] .card-back { padding: 12px; }
-body[data-card-view="mini"] .card-back .card-top { padding: 0; }
 body[data-card-view="mini"] .card-back .setting { margin-bottom: 12px; }
 body[data-card-view="mini"] .card-back .settings-city { margin-bottom: 12px; }
 body[data-card-view="mini"] .card-back .segments button { font-size: 11px; }
