@@ -117,6 +117,8 @@ try {
  await writeFile(workerPath,oldWorker.replace(manifest.revision,'working-update').replace(hash(oldCSS),hash(newCSS)));
  await page.evaluate(async()=>{await(await navigator.serviceWorker.getRegistration()).update();});
  await page.waitForFunction(async()=>!!(await navigator.serviceWorker.getRegistration()).waiting);
+ // Registration state can become observable before the UI's statechange handler runs.
+ await page.waitForFunction(()=>document.querySelector('#offline-status').textContent.includes('Update ready'));
  assert.match(await page.locator('#offline-status').textContent(),/Update ready/);
  assert.ok(Object.keys(await cacheKeys()).some(name=>name.endsWith(manifest.revision)),'Old tabs retain their assets');
  // A page outside the scope can watch activation without keeping the old worker alive.
