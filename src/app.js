@@ -66,7 +66,8 @@ function measureLayout() {
   const columns = style.gridTemplateColumns.split(' ').length;
   const gap = parseFloat(style.columnGap) || 0;
   const width = (grid.clientWidth - gap * (columns - 1)) / columns;
-  const height = document.body.dataset.cardView === 'mini' ? Math.max(280, width + 100) : Math.max(440, width + 132);
+  const miniExtraHeight = parseFloat(style.getPropertyValue('--mini-card-extra-height')) || 100;
+  const height = document.body.dataset.cardView === 'mini' ? Math.max(280, width + miniExtraHeight) : Math.max(440, width + 132);
   layout = { columns, gap, width, height };
   grid.style.setProperty('--card-height', `${height}px`);
 }

@@ -328,11 +328,15 @@ body[data-card-view="mini"] .card-back .setting { margin-bottom: 12px; }
 body[data-card-view="mini"] .card-back .settings-city { margin-bottom: 12px; }
 body[data-card-view="mini"] .card-back .segments button { font-size: 11px; }
 body[data-card-view="mini"] .card-back .remove { flex-shrink: 0; }
+@media (max-width: 640px) {
+  body[data-card-view="mini"] .page { padding-inline: 12px; }
+  body[data-card-view="mini"] .clock-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; --mini-card-extra-height: 136px; }
+  body[data-card-view="mini"] .card-front { padding-inline: 8px; }
+  body[data-card-view="mini"] [data-display="analog"] .clock-face { margin: 6px 0; padding: 0; }
+}
 @media (max-width: 479px) {
-  body[data-card-view="mini"] .clock-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   body[data-card-view="mini"] .city-title { font-size: 13px; }
   body[data-card-view="mini"] .card-front .card-top { font-size: 13px; }
-  body[data-card-view="mini"] .card-front { padding-left: 8px; padding-right: 8px; }
   body[data-card-view="mini"] .card-back { padding: 8px; }
   body[data-card-view="mini"] .move-controls { flex-direction: column; gap: 4px; }
 }
