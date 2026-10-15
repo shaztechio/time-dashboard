@@ -6,7 +6,7 @@ Documentation reviewed against the implementation on 2026-10-15.
 
 ## Run locally
 
-Requires Node.js 22 or newer. No package installation is needed for the app or unit tests.
+Requires Node.js 22 or newer. No package installation is needed to run the app or unit tests. Browser tests use the pinned Playwright development dependency installed with `npm ci`.
 
 ```sh
 npm run dev
@@ -81,10 +81,10 @@ npm run build
 
 Unit tests cover the catalog, search, duplicates, URL serialization and validation (including card designs and 1,000+ clocks), explicit gzip loading and JSON fallbacks, drag physics, Time Travel, fractional offsets, local dates, and northern/southern DST transitions (including Lord Howe’s half-hour shift).
 
-The browser suite uses Playwright as an optional development tool. Install it locally, install its Chromium browser, and start `npm run dev` in another terminal:
+The browser suite uses Playwright as an optional development tool. Install the locked development dependencies and Chromium, and start `npm run dev` in another terminal:
 
 ```sh
-npm install --no-save --package-lock=false playwright
+npm ci
 npx playwright install chromium
 npm run build
 npm run test:browser
@@ -102,6 +102,12 @@ The scale suite opens real 1,000-clock links, verifies bounded rendering and tic
 The design suite checks separate settings panels, shared design state, reset/history, light/dark variants, accessible focus, and mini/standard palette labels. The mini suite checks layout, dragging, history, mobile sizing, and 1,000 frozen clocks; the travel suite checks frozen instants and DST-aware editing. The offline suite verifies compressed downloads, lazy caching, offline use, and safe worker updates.
 
 The interaction suite checks desktop/mobile layout, keyboard selection, format changes, shared links in a fresh context, history, adding beyond eight clocks, custom ordering, empty states, safe URL text, search errors/retry, and clipboard fallback. Chromium automation does not replace physical-device or VoiceOver/Safari/Firefox testing.
+
+## Pull request checks
+
+The [PR checks workflow](.github/workflows/ci.yml) runs for pull requests and can also be started manually. It uses Node.js 22 and `npm ci` with the committed lockfile. The **Unit tests and production build** job runs unit tests and builds `dist/`. Six independent Chromium jobs cover interactions (`browser`), 1,000-clock behavior (`scale`), Time Travel (`travel`), mini cards (`mini`), card designs (`design`), and offline use (`offline`). Browser jobs build their own production assets and start a local development server when needed; the offline suite starts its own isolated server.
+
+Screenshots and logs are uploaded as per-suite artifacts for seven days, including on failure. New pushes to a PR cancel its superseded check run; one failed browser suite does not cancel the others. PR checks use read-only repository permissions, require no deployment secrets, and do not publish the site. Pages deployment remains a separate workflow for pushes to `main`. These checks run automatically; requiring them before merge is a separate repository protection setting.
 
 ## Static deployment
 

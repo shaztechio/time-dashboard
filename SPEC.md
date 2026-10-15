@@ -72,6 +72,8 @@ Support 320 px phones, tablets, and desktop layouts with no horizontal overflow.
 
 ## Validation and delivery
 
+`.github/workflows/ci.yml` runs unit/build checks and six independent Chromium suites for pull requests or manual dispatch. Tooling uses Node.js 22 and locked Playwright dependencies via `npm ci`. Preserve screenshots and logs for seven days and keep PR permissions read-only, without Pages deployment access. New commits cancel superseded PR check runs.
+
 - Unit tests: URL packing/compression/validation, 1,000+ record round-trips, catalog integrity, search, duplicate handling, timezone suggestions, DST, fractional offsets, time text, drag motion, compact card designs, and explicit gzip/JSON fallback handling.
 - Browser tests: desktop/mobile layout, card settings, theme modes and storage failures, search and retries, copy fallbacks, custom order, pointer/keyboard dragging, cancellation, and history. Dedicated mini-card, design, and Time Travel suites cover their layouts, persistence, and controls; the offline suite covers gzip transfers, cache recovery, offline edits, and safe worker updates.
 - Scale tests: real 1,000-clock fragment navigation and reload, bounded mounted cards and time formatting, middle/end scrolling, drag auto-scroll across virtualized rows, full-state edits/order/copy/sort, fresh shared links, 1,001 clocks, soft-cap warning transitions, and mobile width.
