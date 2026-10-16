@@ -16,6 +16,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { gzipSync as nodeGzipSync, constants as zlibConstants } from 'node:zlib';
 import { gzipSync } from '../src/vendor/fflate.js';
 import { defaults, readState, stateURL, validateClocks, clockTitle, decodeTokens, readCompactControls } from '../src/state.js';
 import { clockCatalog, CATALOG_VERSION } from '../src/catalog.js';
@@ -88,6 +89,36 @@ test('malformed, corrupt, unknown, duplicate, and old records fail explicitly', 
 test('clock validation still rejects invalid fields, settings, and duplicates', () => {
   const clock = defaults()[0];
   for (const records of [null, [null], [clock, clock], [{ ...clock, hours: 13 }], [{ ...clock, zone: 'Invalid/Zone' }], [{ ...clock, display: 'sun' }], [{ ...clock, extra: true }]]) assert.throws(() => validateClocks(records));
+});
+
+test('forged gzip sizes cannot hide excess literals, stored bytes, or backreferences', () => {
+  const cases = [
+    { prefix: '[]', raw: Buffer.from('[]X'), options: { strategy: zlibConstants.Z_FIXED } },
+    { prefix: '[]', raw: Buffer.from('[]X'), options: { level: 0 } },
+    { prefix: '[]        ', raw: Buffer.from('[]' + ' '.repeat(300)), options: { strategy: zlibConstants.Z_FIXED } },
+    { prefix: '[]        ', raw: Buffer.from('[]' + ' '.repeat(2 * 1024 * 1024)), options: {} },
+  ];
+  for (const { prefix, raw, options } of cases) {
+    const bytes = nodeGzipSync(raw, options);
+    // Forge both ISIZE and CRC for the valid JSON prefix. A truncating inflater
+    // would return [] and pass every subsequent length, checksum, and JSON check.
+    bytes.set(nodeGzipSync(Buffer.from(prefix)).subarray(-8), bytes.length - 8);
+    const url = `${base}#v2.${CATALOG_VERSION}.${bytes.toString('base64url')}`;
+    assert.throws(() => decodeTokens(url), /Decompressed data exceeds output buffer size/);
+    const state = readState(url, catalog);
+    assert.equal(state.error, true);
+    assert.deepEqual(state.clocks, defaults());
+  }
+});
+
+test('gzip output at the decoded limit succeeds and output above it fails', () => {
+  const limit = 1024 * 1024;
+  for (const size of [limit, limit + 1]) {
+    const bytes = nodeGzipSync(Buffer.from('[]' + ' '.repeat(size - 2)));
+    const url = `${base}#v2.${CATALOG_VERSION}.${bytes.toString('base64url')}`;
+    if (size === limit) assert.deepEqual(decodeTokens(url), []);
+    else assert.throws(() => decodeTokens(url), /decoded size limit/);
+  }
 });
 
 test('per-card designs survive sharing, formats, ordering, and 1000-clock links', () => {

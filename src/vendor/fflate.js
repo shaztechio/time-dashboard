@@ -259,6 +259,9 @@ var inflt = function (dat, st, buf, dict) {
                 // ensure size
                 if (resize)
                     cbuf(bt + l);
+                // Local security patch: a fixed output buffer is a hard limit.
+                else if (bt + l > buf.length)
+                    throw new RangeError('Decompressed data exceeds output buffer size');
                 // Copy over uncompressed data
                 buf.set(dat.subarray(s, t), bt);
                 // Get new bitpos, update byte count
@@ -342,8 +345,11 @@ var inflt = function (dat, st, buf, dict) {
             }
             if (!c)
                 err(2);
-            if (sym < 256)
+            if (sym < 256) {
+                if (!resize && bt >= buf.length)
+                    throw new RangeError('Decompressed data exceeds output buffer size');
                 buf[bt++] = sym;
+            }
             else if (sym == 256) {
                 lpos = pos, lm = null;
                 break;
@@ -375,6 +381,8 @@ var inflt = function (dat, st, buf, dict) {
                 if (resize)
                     cbuf(bt + 131072);
                 var end = bt + add;
+                if (!resize && end > buf.length)
+                    throw new RangeError('Decompressed data exceeds output buffer size');
                 if (bt < dt) {
                     var shift = dl - dt, dend = Math.min(dt, end);
                     if (shift + bt < 0)

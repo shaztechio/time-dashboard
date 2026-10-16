@@ -100,6 +100,8 @@ export function decodeTokens(url) {
   const trailer = new DataView(bytes.buffer, bytes.byteOffset + bytes.length - 8, 8);
   const size = trailer.getUint32(4, true);
   if (size > MAX_DECODED_BYTES) throw new Error('Clock link exceeds the decoded size limit.');
+  // The locally patched inflater aborts before exceeding this buffer, even if
+  // the untrusted gzip trailer understates the actual decompressed size.
   const raw = gunzipSync(bytes, { out: new Uint8Array(size) });
   if (raw.length !== size || crc32(raw) !== trailer.getUint32(0, true)) throw new Error('Clock link is corrupted.');
   const tokens = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(raw));
