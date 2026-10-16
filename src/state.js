@@ -19,6 +19,7 @@ import { CATALOG_VERSION, CATALOG_VERSIONS } from './catalog.js';
 export const SOFT_CLOCK_LIMIT = 1000;
 const MAX_DECODED_BYTES = 1024 * 1024;
 const MAX_FRAGMENT_CHARS = 512 * 1024;
+const FRAGMENT_PATTERN = /^#v2\.([0-9]{4}-[0-9]{2}-[0-9]{2})\.([A-Za-z0-9_-]+)(;controls=compact)?$/;
 export const PRESET_CITIES = {
   'preset:pacific': 'geonames:5368361',
   'preset:india': 'geonames:1275004',
@@ -82,13 +83,16 @@ function base64url(bytes) {
   for (let i = 0; i < bytes.length; i += 8192) text += String.fromCharCode(...bytes.subarray(i, i + 8192));
   return btoa(text).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
 }
+export function readCompactControls(url) {
+  return !!FRAGMENT_PATTERN.exec(new URL(url).hash)?.[3];
+}
 export function decodeTokens(url) {
   const parsed = new URL(url);
   if (!parsed.hash || parsed.hash === '#clocks') {
     if (parsed.searchParams.has('v') || parsed.searchParams.has('clocks')) throw new Error('This older link format is no longer supported.');
     return null;
   }
-  const match = /^#v2\.([0-9]{4}-[0-9]{2}-[0-9]{2})\.([A-Za-z0-9_-]+)$/.exec(parsed.hash);
+  const match = FRAGMENT_PATTERN.exec(parsed.hash);
   if (!match || parsed.hash.length > MAX_FRAGMENT_CHARS) throw new Error('Invalid or oversized clock link.');
   if (!CATALOG_VERSIONS.includes(match[1])) throw new Error('This link needs an unavailable city catalog.');
   const bytes = Uint8Array.from(atob(match[2].replaceAll('-', '+').replaceAll('_', '/')), c => c.charCodeAt(0));
@@ -126,7 +130,7 @@ export function readState(url, catalog) {
     return { clocks: validateClocks(records), error: false };
   } catch (error) { return { clocks: defaults(), error: true, message: error.message }; }
 }
-export function stateURL(url, clocks) {
+export function stateURL(url, clocks, { compactControls = readCompactControls(url) } = {}) {
   const parsed = new URL(url);
   const tokens = validateClocks(clocks).map(clock => {
     const identity = cityIdentity(clock);
@@ -140,6 +144,7 @@ export function stateURL(url, clocks) {
   parsed.searchParams.delete('v');
   parsed.searchParams.delete('clocks');
   parsed.hash = `v2.${CATALOG_VERSION}.${base64url(gzipSync(raw, { level: 6, mtime: 0 }))}`;
+  if (compactControls) parsed.hash += ';controls=compact';
   if (parsed.hash.length > MAX_FRAGMENT_CHARS) throw new Error('Clock link is too large.');
   return parsed.href;
 }

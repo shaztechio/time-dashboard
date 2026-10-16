@@ -176,6 +176,7 @@ function render() {
   $('#time-travel').disabled = loadingLocation;
   $('#adjust-time').disabled = loadingLocation;
   $('#resume-time').disabled = loadingLocation;
+  $('#controls-toggle').disabled = loadingLocation;
   for (const button of document.querySelectorAll('button[data-card-view]')) button.disabled = loadingLocation;
   $('#sort-ascending').disabled = clocks.length < 2 || loadingLocation;
   $('#sort-descending').disabled = clocks.length < 2 || loadingLocation;
@@ -648,5 +649,16 @@ setupTimeTravel({ getInstant: currentInstant, getClocks: () => clocks, setInstan
     return true;
   } catch (error) { announce(error.message); return false; }
 } });
-setupMobileMenu();
+setupMobileMenu({ onCompactChange(compactControls) {
+  if (loadingLocation) return false;
+  if (drag) clearDrag();
+  try {
+    const url = travelURL(stateURL(location.href, clocks, { compactControls }), frozenAt);
+    history.pushState(null, '', url);
+    locationRequest++;
+    activeLocation = url;
+    $('#notice').hidden = true;
+    return true;
+  } catch { announce('The browser could not save the controls setting. Please try again.'); return false; }
+} });
 loadLocation();

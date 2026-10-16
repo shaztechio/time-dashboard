@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 :root {
+  --compact-control-size: 32px;
   color-scheme: dark;
   font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
   font-synthesis: none;
@@ -64,13 +65,21 @@ button, a, input, textarea { -webkit-tap-highlight-color: transparent; }
 button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--orange); outline-offset: 4px; }
 [hidden] { display: none !important; }
 .page { max-width: 1480px; padding: 0 48px; margin: auto; }
-.site-header { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 24px; padding: 45px 0 32px; }
+.site-header { position: relative; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 24px; padding: 45px 0 32px; }
 h1 { margin: 0; font-size: 40px; line-height: 1.1; letter-spacing: -1.5px; font-weight: 700; }
 .header-meta { display: flex; justify-content: center; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; margin-top: 14px; }
 #clock-count { font-variant-numeric: tabular-nums; }
 .toolbar-actions { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; }
-#menu-toggle { display: none; }
-#menu-toggle svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+#menu-toggle { display: none; width: var(--compact-control-size); height: var(--compact-control-size); }
+.heading { width: 100%; }
+.heading-row { position: relative; display: flex; justify-content: center; align-items: center; min-height: 44px; }
+.header-menu-controls { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 8px; }
+#controls-toggle { width: var(--compact-control-size); height: var(--compact-control-size); color: var(--muted); }
+#controls-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+#controls-toggle[aria-pressed="true"] { background: var(--raised); color: var(--text); }
+#controls-toggle[aria-pressed="true"] .controls-panel { display: none; }
+body[data-compact-controls="true"] #menu-toggle { display: inline-flex; background: var(--surface); }
+#menu-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
 #mobile-menu { width: min(400px, calc(100vw - 24px)); height: fit-content; max-height: calc(100dvh - 24px); margin: 12px 12px 12px auto; padding: 20px; border: 1px solid var(--line); border-radius: 24px; }
 #mobile-menu .dialog-heading { padding: 0 40px 0 0; justify-content: flex-start; margin-bottom: 20px; }
 #mobile-menu h2 { font-size: 22px; }
@@ -79,7 +88,8 @@ h1 { margin: 0; font-size: 40px; line-height: 1.1; letter-spacing: -1.5px; font-
 #mobile-menu .toolbar-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 #mobile-menu .button { padding-inline: 10px; }
 #mobile-menu .secondary { background: var(--raised); }
-#mobile-menu .view-controls, #mobile-menu .theme-controls { width: 100%; margin: 0; }
+#mobile-menu .view-controls { width: 100%; margin: 0; }
+#mobile-menu .theme-controls { margin: 0; }
 #mobile-menu .segments button { flex: 1; min-height: 44px; padding-inline: 6px; font-size: 12px; }
 #mobile-menu .sort-controls { display: grid; justify-content: stretch; gap: 4px; margin: 0; }
 #mobile-menu .sort-controls button { background: var(--raised); border-radius: 12px; }
@@ -221,7 +231,10 @@ label[for="city-search"] { display: block; color: var(--muted); font-size: 12px;
   .site-header { position: relative; padding: 24px 48px; align-items: center; gap: 0; text-align: center; }
   h1 { font-size: clamp(23px, 5.7vw, 30px); letter-spacing: -1px; }
   .header-meta { justify-content: center; flex-wrap: wrap; font-size: 10px; gap: 6px; margin-top: 9px; }
-  #menu-toggle { display: inline-flex; position: absolute; right: 0; top: 20px; background: var(--surface); }
+  .heading-row { position: static; display: block; min-height: 0; }
+  .header-menu-controls { top: 20px; transform: none; }
+  #controls-toggle { display: none; }
+  #menu-toggle { display: inline-flex; background: var(--surface); }
   #empty-add { display: none; }
   .toolbar-actions { width: 100%; justify-content: center; }
   .button { font-size: 13px; }
@@ -274,9 +287,13 @@ label[for="city-search"] { display: block; color: var(--muted); font-size: 12px;
 .move-controls { display: flex; gap: 8px; margin: 0 0 14px; }
 .move-controls button { min-height: 44px; flex: 1; border-radius: 8px; padding: 8px 4px; background: var(--raised); color: var(--orange); font-size: 11px; }
 
-.theme-controls { width: min(264px, 100%); margin: 20px auto 0; color: var(--text); }
-.theme-controls button { min-height: 44px; }
+.theme-controls { width: max-content; margin: 20px auto 0; border-radius: 999px; color: var(--muted); }
+.theme-controls button, #mobile-menu .theme-controls button { display: inline-flex; align-items: center; justify-content: center; width: var(--compact-control-size); height: var(--compact-control-size); min-height: var(--compact-control-size); padding: 0; border-radius: 50%; }
+.theme-controls svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .theme-controls button:hover:not([aria-pressed="true"]) { background: var(--hover); }
+@media (any-pointer: coarse) {
+  :root { --compact-control-size: 44px; }
+}
 
 /* Time Travel uses a cool accent and an explicit paused label on every card. */
 :root { --frozen: #88c9ff; --frozen-bg: #142638; }

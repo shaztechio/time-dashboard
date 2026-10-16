@@ -17,7 +17,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { gzipSync } from '../src/vendor/fflate.js';
-import { defaults, readState, stateURL, validateClocks, clockTitle, decodeTokens } from '../src/state.js';
+import { defaults, readState, stateURL, validateClocks, clockTitle, decodeTokens, readCompactControls } from '../src/state.js';
 import { clockCatalog, CATALOG_VERSION } from '../src/catalog.js';
 const catalog = clockCatalog(JSON.parse(await readFile(new URL('../data/clock-catalog-2026-10-14.json', import.meta.url))));
 const base = 'https://example.com/time-dashboard/';
@@ -46,6 +46,23 @@ test('compact records preserve order and all format combinations and resolve cat
 test('empty configuration is explicit and requires no catalog', () => {
   assert.deepEqual(readState(stateURL(base, [])).clocks, []);
   assert.deepEqual(decodeTokens(stateURL(base, [])), []);
+});
+test('compact controls round-trip in the fragment and missing settings use expanded controls', () => {
+  const original = stateURL(`${base}?view=standard&at=2026-10-16T00:00:00Z`, defaults());
+  assert.equal(readCompactControls(base), false);
+  assert.equal(readCompactControls(original), false);
+  const compact = stateURL(original, defaults(), { compactControls: true });
+  assert.equal(new URL(compact).hash, new URL(original).hash + ';controls=compact');
+  assert.equal(new URL(compact).search, new URL(original).search);
+  assert.equal(readCompactControls(compact), true);
+  assert.deepEqual(readState(compact, catalog).clocks, defaults());
+  const reordered = defaults().toReversed();
+  const edited = stateURL(compact, reordered);
+  assert.equal(readCompactControls(edited), true);
+  assert.deepEqual(readState(edited, catalog).clocks, reordered);
+  assert.equal(stateURL(compact, defaults(), { compactControls: false }), original);
+  assert.deepEqual(decodeTokens(stateURL(base, [], { compactControls: true })), []);
+  assert.equal(readState(original + ';controls=invalid', catalog).error, true);
 });
 test('1000 and larger dashboards round-trip in compact fragment URLs', () => {
   for (const n of [1000, 1001, 5000]) {

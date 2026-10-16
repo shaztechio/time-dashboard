@@ -59,11 +59,13 @@ Frozen instants are saved in the optional `at` query parameter alongside the com
 
 ## URL format
 
-The URL is the persistent clock configuration; no account is used. Clock order, display formats, and card designs are stored in the fragment; card size and Time Travel use query parameters. The page appearance preference is stored locally, and downloaded app/catalog files are cached for offline use:
+The URL is the persistent clock configuration; no account is used. Clock order, display formats, card designs, and the desktop controls setting are stored in the fragment; card size and Time Travel use query parameters. The page appearance preference is stored locally, and downloaded app/catalog files are cached for offline use:
 
 ```text
 #v2.2026-10-14.<gzip-base64url-payload>
 ```
+
+The panel icon beside the title toggles compact desktop controls. Compact mode appends `;controls=compact` to the fragment and places controls in the hamburger menu. Without this setting, desktop controls are expanded. Copied links, reloads, and browser Back/Forward preserve the setting; phones always use the hamburger menu.
 
 The payload stores an ordered array of packed city IDs and display/hour flags, with optional compact per-card design codes. Names and zones come from an immutable static lookup catalog. Fragment data is not sent in HTTP requests, so large dashboards can reload without enlarging the server request URL. An early 1,000-clock test link used approximately 5.5 KB; actual length varies with city IDs, formats, and card designs.
 

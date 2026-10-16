@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { readCompactControls } from './state.js';
 // Keep one set of controls and listeners, returning them to their desktop slots.
-export function setupMobileMenu() {
+export function setupMobileMenu({ onCompactChange }) {
   const menu = document.querySelector('#mobile-menu');
   const toggle = document.querySelector('#menu-toggle');
+  const compactToggle = document.querySelector('#controls-toggle');
   const mobile = matchMedia('(max-width: 640px)');
+  let compact = readCompactControls(location.href);
   const controls = [
     ['.toolbar-actions', '#menu-actions'],
     ['.travel-actions', '#menu-travel'],
@@ -39,19 +42,37 @@ export function setupMobileMenu() {
   function relocate() {
     const focused = document.activeElement;
     const wasOpen = menu.open;
+    const useMenu = mobile.matches || compact;
     if (wasOpen) close();
+    document.body.dataset.compactControls = String(compact);
+    compactToggle.setAttribute('aria-pressed', String(compact));
+    compactToggle.title = compact ? 'Show controls' : 'Hide controls';
     for (const { element, slot, destination } of controls) {
-      if (mobile.matches) destination.append(element);
+      if (useMenu) destination.append(element);
       else slot.after(element);
     }
-    if (!mobile.matches && (wasOpen || focused === toggle)) {
+    if (!useMenu && (wasOpen || focused === toggle)) {
       const target = controls.some(({ element }) => element.contains(focused))
         ? focused : document.querySelector('#time-travel');
       target.focus({ preventScroll: true });
-    } else if (mobile.matches && controls.some(({ element }) => element.contains(focused))) {
+    } else if (useMenu && (controls.some(({ element }) => element.contains(focused)) || (mobile.matches && focused === compactToggle))) {
       toggle.focus({ preventScroll: true });
     }
   }
+  compactToggle.addEventListener('click', () => {
+    if (!onCompactChange(!compact)) return;
+    compact = !compact;
+    relocate();
+  });
+  function syncLocation() {
+    const next = readCompactControls(location.href);
+    if (next !== compact) {
+      compact = next;
+      relocate();
+    }
+  }
+  window.addEventListener('popstate', syncLocation);
+  window.addEventListener('hashchange', syncLocation);
   toggle.addEventListener('click', () => {
     menu.showModal();
     toggle.setAttribute('aria-expanded', 'true');

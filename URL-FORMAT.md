@@ -11,6 +11,7 @@ https://example.com/time-dashboard/#v2.2026-10-14.<payload>
 - `v2` is the format version.
 - `2026-10-14` identifies an immutable city lookup catalog, not the current date.
 - `payload` is UTF-8 JSON compressed with gzip, then encoded as unpadded base64url (`A–Z`, `a–z`, `0–9`, `_`, `-`).
+- An optional `;controls=compact` suffix after the payload selects compact desktop controls. Missing this suffix means expanded controls, regardless of any old local preference. Mobile always uses the menu. Use `stateURL(url, clocks, { compactControls: true })` to set it, or `false` to remove it; ordinary `stateURL` calls preserve it. The suffix is outside the compressed payload and is included in the fragment size limit.
 - The fragment is handled in the browser. It is not included in the HTTP request to the static server, so a large clock configuration does not enlarge that request's path or headers.
 - Existing unrelated query parameters and the deployment path are preserved. Obsolete `v` and `clocks` query parameters are removed when writing a link. The fragment belongs exclusively to dashboard state; the skip-to-clocks control uses focus rather than modifying it.
 
